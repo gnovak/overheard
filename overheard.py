@@ -44,7 +44,7 @@
 # main
 
 
-import re, tempfile, os, contextlib, subprocess, shutil, time, datetime
+import re, tempfile, os, subprocess, shutil, time, datetime
 
 import feedparser
 
@@ -59,15 +59,6 @@ import path
 # Backslash-percent (to get percent into the latex output) shows up in
 # the python strings as "\\%" and a regexp for just '%' doesn't match
 # them, which simplifies my life...
-
-### Code snippet from http://stackoverflow.com/questions/169070/
-@contextlib.contextmanager
-def remember_cwd():
-    curdir= os.getcwd()
-    try: yield
-    finally: os.chdir(curdir)
-### End snippet from Stackexchange
-
 
 def extension(fn):
     "Get the extension of a filename"

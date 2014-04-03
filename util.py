@@ -1,4 +1,12 @@
-import cPickle
+import os, cPickle, contextlib
+
+### Code snippet from http://stackoverflow.com/questions/169070/
+@contextlib.contextmanager
+def remember_cwd():
+    curdir= os.getcwd()
+    try: yield
+    finally: os.chdir(curdir)
+### End snippet from Stackexchange
 
 ### Code snippet from gsn_util package
 ### https://pypi.python.org/pypi/gsn_util/

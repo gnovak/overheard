@@ -1,6 +1,6 @@
 import unittest
 
-import arxiv_id, scrape
+import arxiv_id, scrape, util
 
 from overheard import *
 
@@ -18,6 +18,28 @@ from overheard import *
 # Run specific test interactively from REPL
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
+
+class UtilTest(unittest.TestCase):
+    def test_remember_cwd(self): 
+        cwd = os.getcwd()
+        with util.remember_cwd():
+            os.chdir("..")
+        self.assertEqual(os.getcwd(), cwd)
+        
+    def test_can_uncan_file_object(self):         
+        obj = [1,2,3]
+        tf = tempfile.TemporaryFile()
+        util.can(obj, tf)
+        tf.seek(0)
+        self.assertEqual(util.uncan(tf), obj)
+
+    def test_can_uncan_file_name(self): 
+        obj = [1,2,3]
+        tf = tempfile.NamedTemporaryFile()
+        util.can(obj, tf.name)
+        tf.seek(0)
+        self.assertEqual(util.uncan(tf.name), obj)
+    
 
 class ArchivTest(unittest.TestCase):
 
