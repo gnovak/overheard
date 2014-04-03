@@ -1,6 +1,6 @@
 import unittest
 
-import arxiv_id
+import arxiv_id, scrape
 
 from overheard import *
 
@@ -83,43 +83,43 @@ class ArchivTest(unittest.TestCase):
         # two versions
         self.assertFalse(arxiv_id.new('1234.5678v1v2'))
 
-class ArchivTest(unittest.TestCase):
+class ScrapeTest(unittest.TestCase):
 
     def test_long_comment_regexp(self):
-        self.assertTrue(re.search(long_comment_regexp, '% and comment'))
-        self.assertTrue(re.search(long_comment_regexp, ' % and comment'))
+        self.assertTrue(re.search(scrape.long_comment_regexp, '% and comment'))
+        self.assertTrue(re.search(scrape.long_comment_regexp, ' % and comment'))
 
         # make sure I get the whole comment
-        self.assertEqual(re.search(long_comment_regexp, '%% and comment').group(1),
+        self.assertEqual(re.search(scrape.long_comment_regexp, '%% and comment').group(1),
                          '%% and comment')
-        self.assertEqual(re.search(long_comment_regexp, ' %% and comment').group(1),
+        self.assertEqual(re.search(scrape.long_comment_regexp, ' %% and comment').group(1),
                          '%% and comment')
-        self.assertEqual(re.search(long_comment_regexp, '% and % comment').group(1),
+        self.assertEqual(re.search(scrape.long_comment_regexp, '% and % comment').group(1),
                          '% and % comment')
-        self.assertEqual(re.search(long_comment_regexp, ' % and % comment').group(1),
+        self.assertEqual(re.search(scrape.long_comment_regexp, ' % and % comment').group(1),
                          '% and % comment')
 
         # these are short comments
-        self.assertFalse(re.search(long_comment_regexp, 'some text % and comment'))
-        self.assertFalse(re.search(long_comment_regexp, 'some text %% and comment'))
-        self.assertFalse(re.search(long_comment_regexp, 'some text % and % comment'))
+        self.assertFalse(re.search(scrape.long_comment_regexp, 'some text % and comment'))
+        self.assertFalse(re.search(scrape.long_comment_regexp, 'some text %% and comment'))
+        self.assertFalse(re.search(scrape.long_comment_regexp, 'some text % and % comment'))
 
     def test_short_comment_regexp(self):
-        self.assertTrue(re.search(short_comment_regexp, 'some text % and comment'))
+        self.assertTrue(re.search(scrape.short_comment_regexp, 'some text % and comment'))
 
         # make sure I get the whole comment
-        self.assertEqual(re.search(short_comment_regexp, 'some text % and % comment').group(1),
+        self.assertEqual(re.search(scrape.short_comment_regexp, 'some text % and % comment').group(1),
                          '% and % comment')
-        self.assertEqual(re.search(short_comment_regexp, 'some text %% and comment').group(1),
+        self.assertEqual(re.search(scrape.short_comment_regexp, 'some text %% and comment').group(1),
                          '%% and comment')
                                 
         # these are long comments
-        #self.assertFalse(re.search(short_comment_regexp, '% and comment'))
-        #self.assertFalse(re.search(short_comment_regexp, ' % and comment'))
-        #self.assertFalse(re.search(short_comment_regexp, '%% and comment'))
-        #self.assertFalse(re.search(short_comment_regexp, ' %% and commment'))
-        #self.assertFalse(re.search(short_comment_regexp, '% and % comment'))
-        #self.assertFalse(re.search(short_comment_regexp, ' % and % comment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, '% and comment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, ' % and comment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, '%% and comment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, ' %% and commment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, '% and % comment'))
+        #self.assertFalse(re.search(scrape.short_comment_regexp, ' % and % comment'))
 
 def test():
     #suite = unittest.defaultTestLoader.loadTestsFromName('gsn_util.test')
