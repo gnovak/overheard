@@ -73,24 +73,6 @@ def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
 
-def fetch_rss_maybe():
-    """Get RSS feed.  Cache it to avoid hitting their server continuously
-    while testing"""
-    if False and os.path.exists('rss-feed.dat'):
-        print "Using cached copy of rss feed"
-        return uncan('rss-feed.dat')
-    else:
-        feed = feedparser.parse('http://arxiv.org/rss/astro-ph')
-        can(feed, 'rss-feed.dat')
-        return feed
-
-def parse_rss_feed():
-    feed = fetch_rss_maybe()
-        
-    result = [ re.search('.*/([0-9.v]*$)', entry['id']).group(1)
-               for entry in feed['entries']]
-    return result
-
 def do_it_all(long_outfn, short_outfn):
     aids = parse_rss_feed()
     fetch_all_latex(aids, delay=60)
