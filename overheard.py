@@ -44,7 +44,7 @@
 # main
 
 
-import re, tempfile, os, contextlib, subprocess, shutil, cPickle, time, datetime
+import re, tempfile, os, contextlib, subprocess, shutil, time, datetime
 
 import feedparser
 
@@ -68,68 +68,11 @@ def remember_cwd():
     finally: os.chdir(curdir)
 ### End snippet from Stackexchange
 
-### Code snippet from gsn_util package
-### https://pypi.python.org/pypi/gsn_util/
-def can(obj, file, protocol=2):
-    """More convenient syntax for pickle, intended for interactive use
-
-    Most likely:
-    >>> can([1,2,3], 'file.dat')
-    But can also do:
-    >>> with open('file.dat', 'w') as f: can([1,2,3], f); can((3,4,5), f)
-
-    """
-    if type(file) is str: f=open(file,'wb')
-    else: f=file
-
-    cPickle.dump(obj, f, protocol=protocol)
-
-    if type(file) is str: f.close()
-
-def uncan(file):
-    """More convenient syntax for pickle, intended for interactive use
-
-    Most likely:
-    >>> obj = uncan('file.dat')
-    But can also do:
-    >>> with open('file.dat') as f: foo = uncan(f); bar = uncan(f)
-
-    """
-    # If filename, should this read until all exhausted?
-    if type(file) is str: f=open(file, 'rb')
-    else: f=file    
-
-    obj = cPickle.load(f)
-
-    if type(file) is str: f.close()
-
-    return obj
-### End code snippet from gsn_util package
 
 def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
 
-def old_arxiv_id(aid):
-    "Is this an old-style arxiv id?"
-    # old-style identifier is seven digits, yymmNNN
-    return re.search('^[0-9]{7}(v[0-9]+)?$', aid)
-
-def new_arxiv_id(aid):
-    "Is this an new-style arxiv id?"
-    # new-style identifier is is 4 digits, dot, 4 digits:
-    # yymm.NNNN
-    return re.search('^[0-9]{4}.[0-9]{4}(v[0-9]+)?$', aid)
-
-def arxiv_to_url(aid):
-    "Change an archiv identifier to a URL"
-    if new_arxiv_id(aid):
-        return "http://arxiv.org/e-print/" + aid
-    elif old_arxiv_id(aid):
-        return "http://arxiv.org/e-print/astro-ph/" + aid
-    else:
-        raise ValueError
- 
 def fetch_command(aid):
     "Give the command to fetch latex source file"
     return ["wget",  "-U 'overheard'", arxiv_to_url(aid)]
