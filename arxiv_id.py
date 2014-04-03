@@ -8,13 +8,4 @@ def new_arxiv_id(aid):
     # new-style identifier is is 4 digits, dot, 4 digits:
     # yymm.NNNN
     return re.search('^[0-9]{4}.[0-9]{4}(v[0-9]+)?$', aid)
-
-def arxiv_to_url(aid):
-    "Change an archiv identifier to a URL"
-    if new_arxiv_id(aid):
-        return "http://arxiv.org/e-print/" + aid
-    elif old_arxiv_id(aid):
-        return "http://arxiv.org/e-print/astro-ph/" + aid
-    else:
-        raise ValueError
  
