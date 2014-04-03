@@ -1,69 +1,89 @@
 import unittest
+
+import arxiv_id
+
 from overheard import *
+
+# Run all tests from command line
+#   python test.py
+#   python -m test
+#
+# Run subset of tests from command line
+#   python -m unittest ArchivTest
+#   python -m unittest ArchivTest.test_old_arxiv_id
+#   
+# Run all tests non-interactively from REPL
+#   import test; test.test()
+#  
+# Run specific test interactively from REPL
+#   test.ArchivTest('test_old_arxiv_id').debug()
+#
 
 class ArchivTest(unittest.TestCase):
 
-    def test_old_arxiv_id(self):
+    def test_arxiv_id_old(self):
         # good ids
-        self.assertTrue(old_arxiv_id('1234567'))
-        self.assertTrue(old_arxiv_id('1234567v1'))
-        self.assertTrue(old_arxiv_id('1234567v12'))
+        self.assertTrue(arxiv_id.old('1234567'))
+        self.assertTrue(arxiv_id.old('1234567v1'))
+        self.assertTrue(arxiv_id.old('1234567v12'))
 
         # too short
-        self.assertFalse(old_arxiv_id('123456'))
-        self.assertFalse(old_arxiv_id('1234567v'))
+        self.assertFalse(arxiv_id.old('123456'))
+        self.assertFalse(arxiv_id.old('1234567v'))
 
         # too long
-        self.assertFalse(old_arxiv_id('12345678'))
+        self.assertFalse(arxiv_id.old('12345678'))
 
         # wrong letter
-        self.assertFalse(old_arxiv_id('1234567a1'))
+        self.assertFalse(arxiv_id.old('1234567a1'))
 
         # junk at start
-        self.assertFalse(old_arxiv_id('a1234567'))
-        self.assertFalse(old_arxiv_id('a1234567v1'))
-        self.assertFalse(old_arxiv_id('a1234567v12'))
+        self.assertFalse(arxiv_id.old('a1234567'))
+        self.assertFalse(arxiv_id.old('a1234567v1'))
+        self.assertFalse(arxiv_id.old('a1234567v12'))
 
         # junk at end
-        self.assertFalse(old_arxiv_id('1234567a'))
-        self.assertFalse(old_arxiv_id('1234567v1a'))
-        self.assertFalse(old_arxiv_id('1234567v12a'))
+        self.assertFalse(arxiv_id.old('1234567a'))
+        self.assertFalse(arxiv_id.old('1234567v1a'))
+        self.assertFalse(arxiv_id.old('1234567v12a'))
 
         # two versions
-        self.assertFalse(old_arxiv_id('1234567v1v2'))
+        self.assertFalse(arxiv_id.old('1234567v1v2'))
 
-    def test_new_arxiv_id(self):
+    def test_arxiv_id_new(self):
         # good ids
-        self.assertTrue(new_arxiv_id('1234.5678'))
-        self.assertTrue(new_arxiv_id('1234.5678v1'))
-        self.assertTrue(new_arxiv_id('1234.5678v12'))
+        self.assertTrue(arxiv_id.new('1234.5678'))
+        self.assertTrue(arxiv_id.new('1234.5678v1'))
+        self.assertTrue(arxiv_id.new('1234.5678v12'))
 
         # wrong delimiter
-        self.assertTrue(new_arxiv_id('1234a5678'))
+        self.assertTrue(arxiv_id.new('1234a5678'))
 
         # too short
-        self.assertFalse(new_arxiv_id('123.5678'))
-        self.assertFalse(new_arxiv_id('1234.567'))
-        self.assertFalse(new_arxiv_id('1234.5678v'))
+        self.assertFalse(arxiv_id.new('123.5678'))
+        self.assertFalse(arxiv_id.new('1234.567'))
+        self.assertFalse(arxiv_id.new('1234.5678v'))
 
         # too long
-        self.assertFalse(new_arxiv_id('1234.56788'))
+        self.assertFalse(arxiv_id.new('1234.56788'))
 
         # wrong letter
-        self.assertFalse(new_arxiv_id('1234.5678a1'))
+        self.assertFalse(arxiv_id.new('1234.5678a1'))
 
         # junk at start
-        self.assertFalse(new_arxiv_id('a1234.5678'))
-        self.assertFalse(new_arxiv_id('a1234.5678v1'))
-        self.assertFalse(new_arxiv_id('a1234.5678v12'))
+        self.assertFalse(arxiv_id.new('a1234.5678'))
+        self.assertFalse(arxiv_id.new('a1234.5678v1'))
+        self.assertFalse(arxiv_id.new('a1234.5678v12'))
 
         # junk at end
-        self.assertFalse(new_arxiv_id('1234.5678a'))
-        self.assertFalse(new_arxiv_id('1234.5678v1a'))
-        self.assertFalse(new_arxiv_id('1234.5678v12a'))
+        self.assertFalse(arxiv_id.new('1234.5678a'))
+        self.assertFalse(arxiv_id.new('1234.5678v1a'))
+        self.assertFalse(arxiv_id.new('1234.5678v12a'))
 
         # two versions
-        self.assertFalse(new_arxiv_id('1234.5678v1v2'))
+        self.assertFalse(arxiv_id.new('1234.5678v1v2'))
+
+class ArchivTest(unittest.TestCase):
 
     def test_long_comment_regexp(self):
         self.assertTrue(re.search(long_comment_regexp, '% and comment'))
