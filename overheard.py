@@ -13,6 +13,8 @@
 # - clean code a little
 # - Post to github
 # - Snarf input from arxiv mailing
+# - Allow partial line /full line to be "long comment"?
+# - remove temp dir
 
 # - Want some kind of clustering: unusual comments: use words that
 #   typically don't appear in sci papers.  Could look for non-comment
@@ -29,17 +31,27 @@
 #  0408420vN gives version N
 #  0408420vN if N > number of versions gives most recent version
 
+
+# Split into:
+# map arxiv id to path
+# extract latex
+# extract comments
+# util
+# dealing with arxiv ids
+# dealing with filenames
+# Shell commands...?
+# RSS feed/downloading new papers
+# main
+
+
 import re, tempfile, os, contextlib, subprocess, shutil, cPickle, time, datetime
 
 import feedparser
 
+import path
+
 # Shell command dependencies:
 # wget, tar, file, cat, gzip
-
-# Make these into absolute paths to make it easy to find files
-exec_dir = os.getcwd()
-tar_dir = os.path.join(exec_dir, 'data')
-latex_dir = os.path.join(exec_dir, 'latex')
 
 # Separate short comments (less than full line) from long comments (at
 # least one full line) because long comments are sometimes full paragraphs.
@@ -148,11 +160,11 @@ def gunzip(aid):
 
 def latex_file_name(aid):
     "Filename of latex source file for archive paper"
-    return os.path.join(latex_dir, aid + '.tex')
+    return os.path.join(path.latex, aid + '.tex')
 
 def tar_file_name(aid):
     "Filename of tar file for archive paper"
-    return os.path.join(tar_dir, aid)
+    return os.path.join(path.tar, aid)
 
 def file_type_string(aid):
     "Must filter out PDF only papers"
@@ -198,7 +210,7 @@ def fetch_latex(aid):
         return False
     else:
         with remember_cwd():
-            os.chdir(tar_dir)
+            os.chdir(path.tar)
             subprocess.call(fetch_command(aid))
         return True
 
@@ -345,7 +357,7 @@ def download_todays_papers():
 
 def main():
     # Ensure required directories exist
-    for the_dir in [tar_dir, latex_dir]:        
+    for the_dir in [path.tar, path.latex]:        
         if not os.path.exists(the_dir):
             os.mkdir(the_dir)
         elif not os.path.isdir(the_dir):
