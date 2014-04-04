@@ -19,6 +19,7 @@ from overheard import *
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
 
+test_aid = '1401.0059'
 network_tests = False
 
 class UpdateTest(unittest.TestCase):
@@ -117,6 +118,24 @@ class ArchivTest(unittest.TestCase):
         self.assertFalse(arxiv_id.new('1234.5678v1v2'))
 
 class ScrapeTest(unittest.TestCase):
+
+    # Note that latex file for test_aid must exist
+
+    def test_long_comments(self):
+        scrape.long_comments(test_aid)
+
+    def test_short_comments(self):
+        scrape.short_comments(test_aid)
+
+    def test_write_output(self):
+        tf_1 = tempfile.NamedTemporaryFile()
+        tf_2 = tempfile.NamedTemporaryFile()
+
+        scrape.write_output([test_aid, test_aid], 
+                            tf_1.name, tf_2.name)
+        
+    # def test_all_comments(self):
+    #     scrape.all_comments(test_aid)
 
     def test_long_comment_regexp(self):
         self.assertTrue(re.search(scrape.long_comment_regexp, '% and comment'))

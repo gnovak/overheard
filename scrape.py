@@ -1,3 +1,7 @@
+import os, re
+
+import fetch
+
 # long comment is 'optional whitepace % comment'
 long_comment_regexp = "^\s*(%.*)$"
 
@@ -9,10 +13,10 @@ long_comment_regexp = "^\s*(%.*)$"
 # that doesn't also match long_comment_regexp"
 short_comment_regexp = '.*?(%.*)$'
 
-def scrape_long_comments(aid):
+def long_comments(aid):
     "Get long comments out of latex file"
 
-    with open(latex_file_name(aid)) as ff:
+    with open(fetch.latex_file_name(aid)) as ff:
         lines = ff.readlines()
 
     # State variable
@@ -45,9 +49,9 @@ def scrape_long_comments(aid):
             raise RuntimeError
     return result
 
-def scrape_short_comments(aid):
+def short_comments(aid):
     "Get short comments out of latex file"
-    with open(latex_file_name(aid)) as ff:
+    with open(fetch.latex_file_name(aid)) as ff:
         lines = ff.readlines()
 
     result = []
@@ -62,24 +66,24 @@ def write_output(aids, long_outfn, short_outfn):
 
     with open(long_outfn, 'w') as outf:
         for aid in aids:
-            comments = scrape_long_comments(aid)
+            comments = long_comments(aid)
             for comment in comments:
                 outf.writelines(comment)
                 outf.write('\n')
 
     with open(short_outfn, 'w') as outf:
         for aid in aids:
-            comments = scrape_short_comments(aid)
+            comments = short_comments(aid)
             for comment in comments:
                 outf.write(comment)
                 outf.write('\n')
     
 
-def scrape_all_comments(aid):
-    "Get comments out of latex file"
-    with open(latex_file_name(aid)) as ff:
-        lines = ff.readlines()
-    short_comments = scrape_short_comments(lines)
-    long_comments = scrape_long_comments(lines)        
-    return short_comments, long_comments
+# def all_comments(aid):
+#     "Get comments out of latex file"
+#     with open(fetch.latex_file_name(aid)) as ff:
+#         lines = ff.readlines()
+#     the_short_comments = short_comments(lines)
+#     the_long_comments = long_comments(lines)        
+#     return the_short_comments, the_long_comments
 
