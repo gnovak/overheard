@@ -1,6 +1,6 @@
 import unittest
 
-import arxiv_id, scrape, util
+import arxiv_id, scrape, util, update
 
 from overheard import *
 
@@ -18,6 +18,17 @@ from overheard import *
 # Run specific test interactively from REPL
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
+
+network_tests = False
+
+class UpdateTest(unittest.TestCase):
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_fetch_rss_maybe(self): 
+        update.fetch_rss_maybe()
+    
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_parse_rss_feed_maybe(self): 
+        update.parse_rss_feed()
 
 class UtilTest(unittest.TestCase):
     def test_remember_cwd(self): 
