@@ -22,7 +22,17 @@ test_aid = '1401.0059'
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
 
-# class OverheardTest(unittest.TestCase):
+class OverheardTest(unittest.TestCase):
+
+    def setUp(self):
+        self.fetch_verbose_setting = fetch.verbose
+        self.update_verbose_setting = update.verbose
+        fetch.verbose = False
+        update.verbose = False
+
+    def tearDown(self):
+        fetch.verbose = self.fetch_verbose_setting
+        update.verbose = self.update_verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_main(self):
@@ -39,6 +49,12 @@ test_aid = '1401.0059'
         overheard.do_it_all(tf_1.name, tf_2.name)
 
 class FetchTest(unittest.TestCase):
+    def setUp(self):
+        self.verbose_setting = fetch.verbose
+        fetch.verbose = False
+
+    def tearDown(self):
+        fetch.verbose = self.verbose_setting
 
     def test_extension(self):
         fetch.extension('filename.txt')
@@ -108,6 +124,13 @@ class FetchTest(unittest.TestCase):
     
 
 class UpdateTest(unittest.TestCase):
+    def setUp(self):
+        self.verbose_setting = update.verbose
+        update.verbose = False
+
+    def tearDown(self):
+        update.verbose = self.verbose_setting
+
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_rss_maybe(self): 
         update.fetch_rss_maybe()

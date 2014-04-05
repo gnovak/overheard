@@ -2,6 +2,8 @@ import os, subprocess, tempfile, shutil, re
 
 import path, util, arxiv_id
 
+verbose = True
+
 def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
@@ -80,7 +82,7 @@ def fetch_latex(aid):
     "Get tar file from archive.org unless we already have it"
     
     if os.path.exists(tar_file_name(aid)):
-        print "Using cached copy of tar file"
+        if verbose: print "Using cached copy of tar file"
         return False
     else:
         with util.remember_cwd():
@@ -105,13 +107,13 @@ def get_latex(aid):
         if (is_uncompressed_tar_file(aid) or 
             is_gzipped_tar_file(aid)):
             # maybe only do this if the latex file doesn't exist?
-            print "Decompressing", aid
+            if verbose: print "Decompressing", aid
             subprocess.call(decompress_command(aid))
         elif is_gzipped_tex_file(aid):
-            print "gunzipping", aid
+            if verbose: print "gunzipping", aid
             gunzip(aid)
         elif is_unknown(aid):
-            print "Unknown file type", aid
+            if verbose: print "Unknown file type", aid
 
         files = os.listdir('.')
         latex_files = [fn for fn in files
