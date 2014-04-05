@@ -1,12 +1,16 @@
-import os
+import os, subprocess, tempfile, shutil, re
 
-import path
+import path, util, arxiv_id
+
+def extension(fn):
+    "Get the extension of a filename"
+    return os.path.splitext(fn)[1][1:]
 
 def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
-    if new_arxiv_id(aid):
+    if arxiv_id.new(aid):
         return "http://arxiv.org/e-print/" + aid
-    elif old_arxiv_id(aid):
+    elif arxiv_id.old(aid):
         return "http://arxiv.org/e-print/astro-ph/" + aid
     else:
         raise ValueError
@@ -79,7 +83,7 @@ def fetch_latex(aid):
         print "Using cached copy of tar file"
         return False
     else:
-        with remember_cwd():
+        with util.remember_cwd():
             os.chdir(path.tar)
             subprocess.call(fetch_command(aid))
         return True
@@ -96,7 +100,7 @@ def get_latex(aid):
     shutil.copyfile(tar_file_name(aid), 
                     os.path.join(tmpdir, aid))
     home_dir = os.getcwd()
-    with remember_cwd():
+    with util.remember_cwd():
         os.chdir(tmpdir)
         if (is_uncompressed_tar_file(aid) or 
             is_gzipped_tar_file(aid)):

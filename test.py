@@ -1,6 +1,6 @@
 import unittest
 
-import arxiv_id, scrape, util, update
+import arxiv_id, scrape, util, update, fetch
 
 from overheard import *
 
@@ -21,6 +21,74 @@ from overheard import *
 
 test_aid = '1401.0059'
 network_tests = False
+class FetchTest(unittest.TestCase):
+
+    def test_extension(self):
+        fetch.extension('filename.txt')
+
+    def test_arxiv_to_url(self):
+        fetch.arxiv_to_url(test_aid)
+
+    def test_fetch_command(self):
+        fetch.fetch_command(test_aid)
+
+    def test_decompress_command(self):
+        fetch.decompress_command(test_aid)
+
+    def test_gunzip_command(self):
+        fetch.gunzip_command(test_aid)
+
+    # FIXME -- this is set to run in particular dir
+    # def test_gunzip(self):
+    #     fetch.gunzip(test_aid)
+
+    def test_latex_file_name(self):
+        fetch.latex_file_name(test_aid)
+
+    def test_tar_file_name(self):
+        fetch.tar_file_name(test_aid)
+
+    def test_file_type_string(self):
+        fetch.file_type_string(test_aid)
+
+    def test_is_uncompressed_tar_file(self):
+        fetch.is_uncompressed_tar_file(test_aid)
+
+    def test_is_gzipped_tar_file(self):
+        fetch.is_gzipped_tar_file(test_aid)
+
+    def test_is_gzipped_tex_file(self):
+        fetch.is_gzipped_tex_file(test_aid)
+
+    def test_is_pdf(self):
+        fetch.is_pdf(test_aid)
+
+    def test_is_valid_latex(self):
+        fetch.is_valid_latex(test_aid)
+
+    def is_valid_latex(self):
+        fetch.is_valid_latex(test_aid)
+
+    def test_is_valid_non_latex(self):
+        fetch.is_valid_non_latex(test_aid)
+
+    def test_is_unknown(self):    
+        fetch.is_unknown(test_aid)
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_fetch_all_latex(self):
+        fetch.fetch_all_latex([test_aid], delay=5)
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_fetch_latex(self):
+        fetch.fetch_latex(test_aid)
+
+    def test_get_all_latex(self):
+        fetch.get_all_latex([test_aid, test_aid])
+
+    def test_get_latex(self):
+        fetch.get_latex(test_aid)
+    
 
 class UpdateTest(unittest.TestCase):
     @unittest.skipIf(not network_tests, "Skipping network tests.")

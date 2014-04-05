@@ -1,4 +1,7 @@
 # Ideas:
+# - add force option to fetch.fetch_latex
+# - fix fetch.fetch_latex and fetch.get_latex names
+# - make predicates is_blah
 # - Make web site that allows you to feed archive ids and get comments
 # - Astro-ph diff: using latexdiff?  Or just diff of tex file?
 # - Take papers from RSS feed
@@ -59,10 +62,6 @@ import path
 # Backslash-percent (to get percent into the latex output) shows up in
 # the python strings as "\\%" and a regexp for just '%' doesn't match
 # them, which simplifies my life...
-
-def extension(fn):
-    "Get the extension of a filename"
-    return os.path.splitext(fn)[1][1:]
 
 def do_it_all(long_outfn, short_outfn):
     aids = parse_rss_feed()
