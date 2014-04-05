@@ -2,10 +2,10 @@ import unittest, re, tempfile, os
 
 import arxiv_id, scrape, util, update, fetch, overheard
 
-long_tests = False
-network_tests = False
+network_tests = True
 
 test_aid = '1401.0059'
+test_delay = 5
 
 # Run all tests from command line
 #   python test.py
@@ -36,17 +36,17 @@ class OverheardTest(unittest.TestCase):
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_main(self):
-        overheard.main()
+        overheard.main(delay=test_delay, prefix=tempfile.gettempdir(), nmax=2)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_download_todays_papers():
-        overheard.download_todays_papers()
+    def test_download_todays_papers(self):
+        overheard.download_todays_papers(delay=test_delay, nmax=2)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def do_it_all(long_outfn, short_outfn):
+    def do_it_all(self):
         tf_1 = tempfile.NamedTemporaryFile()
         tf_2 = tempfile.NamedTemporaryFile()
-        overheard.do_it_all(tf_1.name, tf_2.name)
+        overheard.do_it_all(tf_1.name, tf_2.name, delay=test_delay, nmax=2)
 
 class FetchTest(unittest.TestCase):
     def setUp(self):
@@ -110,7 +110,7 @@ class FetchTest(unittest.TestCase):
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_all_latex(self):
-        fetch.fetch_all_latex([test_aid], delay=5)
+        fetch.fetch_all_latex([test_aid], delay=test_delay)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_latex(self):

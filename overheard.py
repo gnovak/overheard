@@ -47,11 +47,9 @@
 # main
 
 
-import re, tempfile, os, subprocess, shutil, time, datetime
+import os, datetime
 
-import feedparser
-
-import path
+import path, update, fetch, scrape
 
 # Shell command dependencies:
 # wget, tar, file, cat, gzip
@@ -63,17 +61,26 @@ import path
 # the python strings as "\\%" and a regexp for just '%' doesn't match
 # them, which simplifies my life...
 
-def do_it_all(long_outfn, short_outfn):
-    aids = parse_rss_feed()
-    fetch_all_latex(aids, delay=60)
-    get_all_latex(aids)    
-    write_output(aids, long_outfn, short_outfn)
+def do_it_all(long_outfn, short_outfn, delay=60, nmax=None):
+    # nmax is for testing to specify that a small number of papers
+    # should be fetched.
+    aids = update.parse_rss_feed()
+    if not nmax is None: aids = aids[:min(len(aids), nmax)]
+    fetch.fetch_all_latex(aids, delay=delay)
+    fetch.get_all_latex(aids)    
+    scrape.write_output(aids, long_outfn, short_outfn)
 
-def download_todays_papers():
-    aids = parse_rss_feed()
-    fetch_all_latex(aids, delay=60)
+def download_todays_papers(delay=60, nmax=None):
+    # nmax is for testing to specify that a small number of papers
+    # should be fetched.
+    aids = update.parse_rss_feed()
+    if not nmax is None: aids = aids[:min(len(aids), nmax)]
+    fetch.fetch_all_latex(aids, delay=delay)
 
-def main():
+def main(delay=60, prefix='.', nmax=None):
+    # nmax is for testing to specify that a small number of papers
+    # should be fetched.
+
     # Ensure required directories exist
     for the_dir in [path.tar, path.latex]:        
         if not os.path.exists(the_dir):
@@ -82,7 +89,9 @@ def main():
             raise RuntimeError, the_dir + "is not a directory!"
 
     date_str = datetime.date.today().isoformat()
-    do_it_all(date_str + '-long.tex', date_str + '-short.tex')
+    long_fn = os.path.join(prefix, date_str + '-long.tex')
+    short_fn = os.path.join(prefix, date_str + '-short.tex')
+    do_it_all(long_fn, short_fn, delay=delay, nmax=nmax)
 
 if type(__builtins__) is type({}):
     names = __builtins__.keys()
