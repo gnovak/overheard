@@ -1,8 +1,11 @@
-import unittest
+import unittest, re, tempfile, os
 
-import arxiv_id, scrape, util, update, fetch
+import arxiv_id, scrape, util, update, fetch, overheard
 
-from overheard import *
+long_tests = False
+network_tests = False
+
+test_aid = '1401.0059'
 
 # Run all tests from command line
 #   python test.py
@@ -19,8 +22,22 @@ from overheard import *
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
 
-test_aid = '1401.0059'
-network_tests = False
+# class OverheardTest(unittest.TestCase):
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_main(self):
+        overheard.main()
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def test_download_todays_papers():
+        overheard.download_todays_papers()
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
+    def do_it_all(long_outfn, short_outfn):
+        tf_1 = tempfile.NamedTemporaryFile()
+        tf_2 = tempfile.NamedTemporaryFile()
+        overheard.do_it_all(tf_1.name, tf_2.name)
+
 class FetchTest(unittest.TestCase):
 
     def test_extension(self):
