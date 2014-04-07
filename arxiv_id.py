@@ -26,18 +26,24 @@ def new(aid):
 
 def archive(aid):
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
+    if not match: raise ValueError, 'Invalid arxiv id!'
     return match.group(1)
 
 def yymm(aid):
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
+    if not match: raise ValueError, 'Invalid arxiv id!'
     return match.group(2)
 
 def number(aid):
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
+    if not match: raise ValueError, 'Invalid arxiv id!'
     return match.group(3)
 
 def version(aid):
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
-    return match.group(4)
+    if not match: raise ValueError, 'Invalid arxiv id!'
+    # return the empty string rather than None if there's no version
+    # specified b/c this makes downstream code simpler.
+    return match.group(4) or ''
  
 dir_prefix = yymm
