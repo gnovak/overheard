@@ -14,6 +14,8 @@ def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
 
+# Maybe make this take a full path with filename and create all
+# leading dirs to avoid having to split it apart
 def ensure_dir_exists(the_dir):
     """Make sure that the_dir exists and is a directory."""
     # This only creates the last component of the path.  If more than
@@ -25,16 +27,14 @@ def ensure_dir_exists(the_dir):
     
 def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
-    if arxiv_id.new(aid):
-        return "http://arxiv.org/e-print/" + aid
-    elif arxiv_id.old(aid):
-        return "http://arxiv.org/e-print/astro-ph/" + aid
-    else:
-        raise ValueError
+    return "http://arxiv.org/e-print/" + aid
 
-def fetch_command(aid):
+def fetch_command(aid):    
     "Give the command to fetch latex source file"
-    return ["wget",  "-U 'overheard'", arxiv_to_url(aid)]
+    # Direct this to file I want to avoid fussing around with incoming_tar_file_name()
+    return ["wget",  "-U 'overheard'", 
+            "--output-document", tar_file_name_base(aid), 
+            arxiv_to_url(aid)]
 
 def decompress_command(aid):
     "Give the command to decompress a latex source file."    
@@ -42,6 +42,7 @@ def decompress_command(aid):
 
 def gunzip_command(aid):
     "Give the command to decompress a latex source file."    
+    pass
 
 def gunzip(aid):
     old_fn = aid
@@ -49,18 +50,61 @@ def gunzip(aid):
     shutil.copy(old_fn, new_fn)
     subprocess.call(["gunzip",  new_fn])
 
+def file_name_base(aid):
+    "Filename of latex/tar file for archive paper without the extension"
+    if arxiv_id.new(aid): 
+        fn_base = aid
+    else: 
+        # Ugh, four function calls when I could just grab the regexp
+        # match object and pull out what I want.  And all of this is
+        # just to get rid of the slash in the identifier
+        fn_base = (arxiv_id.archive(aid) + arxiv_id.yymm(aid) + 
+                   arxiv_id.number(aid) + arxiv_id.version(aid))
+    return fn_base
+
 def latex_file_name(aid):
     "Filename of latex source file for archive paper"
-    return os.path.join(path.latex, aid + '.tex')
+    return os.path.join(path.latex, dir_prefix(aid), file_name_base(aid) + '.tex')
 
-def tar_file_name(aid):
+def tar_file_name_base(aid):
+    return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
+
+def tar_file_name(aid, with_extension=True):
     "Filename of tar file for archive paper"
-    return os.path.join(path.tar, aid)
+    # Get the name of the tar file.  This is complicated by the fact
+    # that it may have different extensions based on file type.
+    
+    valid_extensions = ['.gz', '.tar', '.pdf']
+
+    paths = [tar_file_name_base(aid) + ext 
+             for ext in valid_extensions]
+    exist = [os.path.isfile(pp) for pp in paths]
+    n_exist = exist.count(True)
+
+    if n_exist > 1:
+        raise RuntimeError, "More than one file exists for" % aid
+    elif n_exist == 0:
+        # This is also used to check if the tar file exists, so if it
+        # doesn't just return False without an exception.
+        #
+        # raise RuntimeError, "No files exist for %s" % aid 
+        return False
+    return paths[exist.index(True)]
 
 def file_type_string(aid):
-    "Must filter out PDF only papers"
-    # Find out what kind of file it is.
-    pipe = subprocess.Popen(["file", tar_file_name(aid)], stdout=subprocess.PIPE)
+    "Find out what kind of file it is."
+    # This might be called to find out how to handle a just-downloaded
+    # file, in which case the data is sitting in
+    # tar_file_name_base(aid).  It might also be called to figure out
+    # how to decompress a previously downloaded file in order to
+    # extract the latex.  In that case, the data is sitting in
+    # tar_file_name(aid)
+    whole_fn = tar_file_name(aid)
+    base_fn = tar_file_name_base(aid)
+
+    if os.path.isfile(whole_fn) and os.path.isfile(base_fn):
+        raise RuntimeError, "More than one file for %s!" % aid
+    pipe = subprocess.Popen(["file", whole_fn or base_fn], stdout=subprocess.PIPE)
     stdout, stderr = pipe.communicate()
     return stdout
 
@@ -95,14 +139,34 @@ def fetch_all_latex(aids, delay=60):
 
 def fetch_latex(aid):
     "Get tar file from archive.org unless we already have it"
-    
-    if os.path.exists(tar_file_name(aid)):
+
+    if tar_file_name(aid):
         if verbose: print "Using cached copy of tar file"
         return False
     else:
-        with util.remember_cwd():
-            os.chdir(path.tar)
+        with util.remember_cwd():            
+            tar_base = tar_file_name_base(aid)
+            dir, fn = os.path.split(tar_base)
+            ensure_dir_exists(dir)
+            os.chdir(dir)
             subprocess.call(fetch_command(aid))
+
+            # rename file to have correct extension
+            if is_pdf(aid):
+                shutil.move(tar_base, tar_base + '.pdf')
+            elif is_gzipped_tar_file(aid) or is_gzipped_tex_file(aid):
+                shutil.move(tar_base, tar_base + '.gz')                
+            elif is_uncompressed_tar_file(aid):
+                shutil.move(tar_base, tar_base + '.tar')
+            else:
+                # This should/would be an exception, but it occurs
+                # when downloading the new astro-ph files for the day.
+                # I don't want an unrecognized file to prevent
+                # downloading other papers, so just print a message
+                # and move on.
+                # 
+                # raise RuntimeError, "Unrecognized file %s" % aid
+                print "WARNING: Unrecognized file type for %s!" % aid
         return True
 
 def get_all_latex(aids):
@@ -114,9 +178,8 @@ def get_latex(aid):
     # Should clean up directory!
     # make things simpler by copying tar file to temp dir
     tmpdir = tempfile.mkdtemp()
-    shutil.copyfile(tar_file_name(aid), 
-                    os.path.join(tmpdir, aid))
-    home_dir = os.getcwd()
+    shutil.copy(tar_file_name(aid), os.path.join(tmpdir))
+
     with util.remember_cwd():
         os.chdir(tmpdir)
         if (is_uncompressed_tar_file(aid) or 
@@ -135,11 +198,17 @@ def get_latex(aid):
                        if extension(fn) == 'tex']
         
         # If there are no latex files, an empty file should be
-        # generated to avoid later file not found errors.
-        with open(latex_file_name(aid), 'w') as outf:
+        # generated to avoid later file not found errors.        
+        latex_fn = latex_file_name(aid)
+        dir, fn = os.path.split(latex_fn)
+        ensure_dir_exists(dir)
+        with open(latex_fn, 'w') as outf:
             if latex_files:
                 # Can have multiple tex files, just concat them
                 subprocess.call(['cat'] + latex_files, stdout=outf)
+            elif is_pdf(aid):
+                # Don't expect to find latex for pdf-only submissions.  
+                pass
             else:
                 print "Warning, no latex found for ", aid
 
