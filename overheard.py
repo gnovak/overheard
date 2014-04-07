@@ -82,6 +82,9 @@ def main(delay=60, prefix='.', nmax=None):
     # should be fetched.
 
     # Ensure required directories exist
+    fetch.ensure_dir_exists(path.tar)
+    fetch.ensure_dir_exists(path.latex)
+
     for the_dir in [path.tar, path.latex]:        
         if not os.path.exists(the_dir):
             os.mkdir(the_dir)

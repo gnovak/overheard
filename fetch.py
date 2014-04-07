@@ -8,6 +8,15 @@ def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
 
+def ensure_dir_exists(the_dir):
+    """Make sure that the_dir exists and is a directory."""
+    # This only creates the last component of the path.  If more than
+    # one component is missing, there will be an error.
+    if not os.path.exists(the_dir):
+        os.mkdir(the_dir)
+    elif not os.path.isdir(the_dir):
+        raise RuntimeError, the_dir + "is not a directory!"
+    
 def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
     if arxiv_id.new(aid):
