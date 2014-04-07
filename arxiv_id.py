@@ -46,4 +46,3 @@ def version(aid):
     # specified b/c this makes downstream code simpler.
     return match.group(4) or ''
  
-dir_prefix = yymm

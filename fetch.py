@@ -4,6 +4,12 @@ import path, util, arxiv_id
 
 verbose = True
 
+# arxiv_id's job is parsing arxiv identifiers.  This module's job is
+# relating that to the filesystem.  The entire archive is partitioned
+# into directories that are just the yymm part of the arxiv id, so
+# just steal that function from the arxiv_id module.
+dir_prefix = arxiv_id.yymm
+
 def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
