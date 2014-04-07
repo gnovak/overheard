@@ -4,7 +4,8 @@ import arxiv_id, scrape, util, update, fetch, overheard
 
 network_tests = True
 
-test_aid = '1401.0059'
+# Actually want two of these, one old, one new.
+test_aids = ['1401.0059', '9909321']
 test_delay = 5
 
 # Run all tests from command line
@@ -60,67 +61,85 @@ class FetchTest(unittest.TestCase):
         fetch.extension('filename.txt')
 
     def test_arxiv_to_url(self):
-        fetch.arxiv_to_url(test_aid)
+        for aid in test_aids:
+            fetch.arxiv_to_url(aid)
 
     def test_fetch_command(self):
-        fetch.fetch_command(test_aid)
+        for aid in test_aids:
+            fetch.fetch_command(aid)
 
     def test_decompress_command(self):
-        fetch.decompress_command(test_aid)
+        for aid in test_aids:
+            fetch.decompress_command(aid)
 
     def test_gunzip_command(self):
-        fetch.gunzip_command(test_aid)
+        for aid in test_aids:
+            fetch.gunzip_command(aid)
 
     # FIXME -- this is set to run in particular dir
     # def test_gunzip(self):
-    #     fetch.gunzip(test_aid)
+    # for aid in test_aids:
+    #     fetch.gunzip(aid)
 
     def test_latex_file_name(self):
-        fetch.latex_file_name(test_aid)
+        for aid in test_aids:
+            fetch.latex_file_name(aid)
 
     def test_tar_file_name(self):
-        fetch.tar_file_name(test_aid)
+        for aid in test_aids:
+            fetch.tar_file_name(aid)
 
     def test_file_type_string(self):
-        fetch.file_type_string(test_aid)
+        for aid in test_aids:
+            fetch.file_type_string(aid)
 
     def test_is_uncompressed_tar_file(self):
-        fetch.is_uncompressed_tar_file(test_aid)
+        for aid in test_aids:
+            fetch.is_uncompressed_tar_file(aid)
 
     def test_is_gzipped_tar_file(self):
-        fetch.is_gzipped_tar_file(test_aid)
+        for aid in test_aids:
+            fetch.is_gzipped_tar_file(aid)
 
     def test_is_gzipped_tex_file(self):
-        fetch.is_gzipped_tex_file(test_aid)
+        for aid in test_aids:
+            fetch.is_gzipped_tex_file(aid)
 
     def test_is_pdf(self):
-        fetch.is_pdf(test_aid)
+        for aid in test_aids:
+            fetch.is_pdf(aid)
 
     def test_is_valid_latex(self):
-        fetch.is_valid_latex(test_aid)
+        for aid in test_aids:
+            fetch.is_valid_latex(aid)
 
     def is_valid_latex(self):
-        fetch.is_valid_latex(test_aid)
+        for aid in test_aids:
+            fetch.is_valid_latex(aid)
 
     def test_is_valid_non_latex(self):
-        fetch.is_valid_non_latex(test_aid)
+        for aid in test_aids:
+            fetch.is_valid_non_latex(aid)
 
     def test_is_unknown(self):    
-        fetch.is_unknown(test_aid)
+        for aid in test_aids:
+            fetch.is_unknown(aid)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_all_latex(self):
-        fetch.fetch_all_latex([test_aid], delay=test_delay)
+        fetch.fetch_all_latex(test_aids, delay=test_delay)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_latex(self):
-        fetch.fetch_latex(test_aid)
+        for aid in test_aids:
+            fetch.fetch_latex(aid)
 
     def test_get_all_latex(self):
-        fetch.get_all_latex([test_aid, test_aid])
+        fetch.get_all_latex(test_aids)
 
     def test_get_latex(self):
-        fetch.get_latex(test_aid)
+        for aid in test_aids:
+            fetch.get_latex(aid)
     
 
 class UpdateTest(unittest.TestCase):
@@ -250,20 +269,23 @@ class ScrapeTest(unittest.TestCase):
     # Note that latex file for test_aid must exist
 
     def test_long_comments(self):
-        scrape.long_comments(test_aid)
+        for aid in test_aids:
+            scrape.long_comments(aid)
 
     def test_short_comments(self):
-        scrape.short_comments(test_aid)
+        for aid in test_aids:
+            scrape.short_comments(aid)
 
     def test_write_output(self):
         tf_1 = tempfile.NamedTemporaryFile()
         tf_2 = tempfile.NamedTemporaryFile()
 
-        scrape.write_output([test_aid, test_aid], 
+        scrape.write_output(test_aids, 
                             tf_1.name, tf_2.name)
         
     # def test_all_comments(self):
-    #     scrape.all_comments(test_aid)
+    # for aid in test_aids:
+    #     scrape.all_comments(aid)
 
     def test_long_comment_regexp(self):
         self.assertTrue(re.search(scrape.long_comment_regexp, '% and comment'))
