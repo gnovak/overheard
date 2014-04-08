@@ -75,25 +75,6 @@ import os, datetime
 
 import path, update, fetch, scrape
 
-# Shell command dependencies:
-# wget, tar, file, cat, gzip
-
-# Separate short comments (less than full line) from long comments (at
-# least one full line) because long comments are sometimes full paragraphs.
-
-# Backslash-percent (to get percent into the latex output) shows up in
-# the python strings as "\\%" and a regexp for just '%' doesn't match
-# them, which simplifies my life...
-
-def do_it_all(long_outfn, short_outfn, delay=60, nmax=None):
-    # nmax is for testing to specify that a small number of papers
-    # should be fetched.
-    aids = update.parse_rss()
-    if not nmax is None: aids = aids[:min(len(aids), nmax)]
-    fetch.all_source(aids, delay=delay)
-    fetch.all_latex(aids)    
-    scrape.write_output(aids, long_outfn, short_outfn)
-
 def main(delay=60, prefix='.', nmax=None):
     # nmax is for testing to specify that a small number of papers
     # should be fetched.
@@ -101,7 +82,13 @@ def main(delay=60, prefix='.', nmax=None):
     date_str = datetime.date.today().isoformat()
     long_fn = os.path.join(prefix, date_str + '-long.tex')
     short_fn = os.path.join(prefix, date_str + '-short.tex')
-    do_it_all(long_fn, short_fn, delay=delay, nmax=nmax)
+
+    aids = update.parse_rss()
+    if not nmax is None: aids = aids[:min(len(aids), nmax)]
+    fetch.all_source(aids, delay=delay)
+    fetch.all_latex(aids)    
+    scrape.write_output(aids, long_outfn, short_outfn)
+
 
 if type(__builtins__) is type({}):
     names = __builtins__.keys()

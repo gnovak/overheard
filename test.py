@@ -53,11 +53,6 @@ class OverheardTest(unittest.TestCase):
     def test_main(self):
         overheard.main(delay=test_delay, prefix=tempfile.gettempdir(), nmax=2)
 
-    @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def do_it_all(self):
-        tf_1 = tempfile.NamedTemporaryFile()
-        tf_2 = tempfile.NamedTemporaryFile()
-        overheard.do_it_all(tf_1.name, tf_2.name, delay=test_delay, nmax=2)
 
 class FetchTest(unittest.TestCase):
     def setUp(self):
