@@ -37,7 +37,7 @@ test_aids = ['astro-ph/0701019',    # gzipped tex file
              '1211.4164',           # gzipped tar file
              '1211.2577']           # PDF file
 
-test_delay = 5
+test_delay = 2
 test_file = "overheard.py"
 
 class OverheardTest(unittest.TestCase):
@@ -143,20 +143,11 @@ class FetchTest(unittest.TestCase):
         fetch.is_other(test_file)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_fetch_all_latex(self):
-        fetch.fetch_all_latex(test_aids, delay=test_delay)
-
-    @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_fetch_latex(self):
-        for aid in test_aids:
-            fetch.fetch_latex(aid)
-
-    def test_get_all_latex(self):
+    def test_fetch_and_get_all_latex(self):
+        # the exercises fetch_latex, fetch_all_latex, get_latex, and
+        # get_all_latex
+        fetch.fetch_all_latex(test_aids, delay=test_delay, force=True)
         fetch.get_all_latex(test_aids)
-
-    def test_get_latex(self):
-        for aid in test_aids:
-            fetch.get_latex(aid)
     
 
 class UpdateTest(unittest.TestCase):
@@ -190,7 +181,6 @@ class UtilTest(unittest.TestCase):
         tf.seek(0)
         self.assertEqual(util.uncan(tf.name), obj)
     
-
 class ArxivIdTest(unittest.TestCase):
 
     def test_old(self):
@@ -277,16 +267,35 @@ class ArxivIdTest(unittest.TestCase):
 
 class ScrapeTest(unittest.TestCase):
 
-    # Note that latex file for test_aid must exist
+    def setUp(self):
+        # Need the latex files for these tests to make sense.  They
+        # may be fetched once, thereafter cached versions will be
+        # used.
+        #
+        # This means that all of the tests in this class depend on the
+        # network
 
+        self.fetch_verbose_setting = fetch.verbose
+        fetch.verbose = False
+
+        any_fetched = fetch.fetch_all_latex(test_aids, delay=test_delay)
+        if any_fetched: 
+            fetch.get_all_latex(test_aids)
+
+    def tearDown(self):
+        fetch.verbose = self.fetch_verbose_setting
+
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_long_comments(self):
         for aid in test_aids:
             scrape.long_comments(aid)
 
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_short_comments(self):
         for aid in test_aids:
             scrape.short_comments(aid)
 
+    @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_write_output(self):
         tf_1 = tempfile.NamedTemporaryFile()
         tf_2 = tempfile.NamedTemporaryFile()
@@ -298,6 +307,7 @@ class ScrapeTest(unittest.TestCase):
     # for aid in test_aids:
     #     scrape.all_comments(aid)
 
+class CommentRegexpTest(unittest.TestCase):
     def test_long_comment_regexp(self):
         self.assertTrue(re.search(scrape.long_comment_regexp, '% and comment'))
         self.assertTrue(re.search(scrape.long_comment_regexp, ' % and comment'))
@@ -335,7 +345,6 @@ class ScrapeTest(unittest.TestCase):
         #self.assertFalse(re.search(scrape.short_comment_regexp, ' % and % comment'))
 
 def test():
-    #suite = unittest.defaultTestLoader.loadTestsFromName('gsn_util.test')
     suite = unittest.defaultTestLoader.loadTestsFromName('test')
     unittest.TextTestRunner().run(suite)
 

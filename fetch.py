@@ -212,16 +212,19 @@ def is_other(aid):
     # message and catch it.
     return False
 
-def fetch_all_latex(aids, delay=60):
+def fetch_all_latex(aids, delay=60, force=False):
+    any_fetched = False
     for aid in aids:
-        wait = fetch_latex(aid)
+        wait = fetch_latex(aid, force=force)
         if wait:
+            any_fetched = True
             time.sleep(delay)
+    return any_fetched
 
-def fetch_latex(aid):
+def fetch_latex(aid, force=False):
     "Get source file from archive.org unless we already have it"
 
-    if source_file_exists(aid):
+    if not force and source_file_exists(aid):
         if verbose: print "Using cached copy of source file"
         return False
     else:
