@@ -191,7 +191,7 @@ class UtilTest(unittest.TestCase):
         self.assertEqual(util.uncan(tf.name), obj)
     
 
-class ArchivTest(unittest.TestCase):
+class ArxivIdTest(unittest.TestCase):
 
     def test_old(self):
         # good ids
