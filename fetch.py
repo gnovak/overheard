@@ -39,10 +39,11 @@ def arxiv_to_url(aid):
 def fetch_command(aid):    
     "Give the command to fetch latex source file"
     # Direct this to file I want to avoid fussing around with incoming_tar_file_name()
-    return ["wget",  "-U 'overheard'", 
-            "--output-document", tar_file_name_base(aid), 
-            arxiv_to_url(aid)]
-
+    return (["wget",  "-U 'overheard'", 
+             "--output-document", tar_file_name_base(aid)] + 
+            ([] if verbose else ["--output-file", "/dev/null"]) + 
+            [arxiv_to_url(aid)])
+            
 def decompress_command(fn):
     "Give the command to decompress a latex source file."    
     return ["tar",  "xf", fn]
