@@ -144,8 +144,8 @@ class UpdateTest(unittest.TestCase):
         update.fetch_rss()
     
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_parse_rss_feed_maybe(self): 
-        update.parse_rss_feed()
+    def test_parse_rss(self): 
+        update.parse_rss()
 
 class UtilTest(unittest.TestCase):
     def test_remember_cwd(self): 
