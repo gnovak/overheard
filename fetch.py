@@ -30,7 +30,8 @@ def ensure_dirs_exist(path_name):
     """
     
     dir, fn = os.path.split(path_name)
-    os.makedirs(dir)
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
     
 def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
@@ -40,7 +41,7 @@ def fetch_command(aid):
     "Give the command to fetch latex source file"
     # Direct this to file I want to avoid fussing around with incoming_tar_file_name()
     return (["wget",  "-U 'overheard'", 
-             "--output-document", tar_file_name_base(aid)] + 
+             "--output-document", tar_file_path_without_extension(aid)] + 
             ([] if verbose else ["--output-file", "/dev/null"]) + 
             [arxiv_to_url(aid)])
             
@@ -88,15 +89,16 @@ def tar_file_name(aid):
     ext = tar_file_extension(aid)
     if not ext:
         raise RuntimeError, "No files exist for %s" % aid 
-    return tar_file_name_base(aid) + ext
+    return file_name_base(aid) + ext
 
 def tar_file_path(aid):
     "Filename of tar file for archive paper"
     return os.path.join(path.tar, dir_prefix(aid), tar_file_name(aid))
 
-# Want to get rid of this function
-def tar_file_name_base(aid):
-   return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
+def tar_file_path_without_extension(aid):
+    # This is used just after downloading a file, when it doesn't have
+    # the correct extension yet b/c we don't know the file type.
+    return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
 
 def tar_file_exists(aid):
     """Determine if the tar file associated with an arxiv id exists."""
@@ -110,7 +112,7 @@ def tar_file_extension(aid):
     """
     valid_extensions = ['.gz', '.pdf']
 
-    paths = [tar_file_name_base(aid) + ext 
+    paths = [tar_file_path_without_extension(aid) + ext 
              for ext in valid_extensions]
     exist = [os.path.isfile(pp) for pp in paths]
     n_exist = exist.count(True)
@@ -157,35 +159,32 @@ def fetch_all_latex(aids, delay=60):
 def fetch_latex(aid):
     "Get tar file from archive.org unless we already have it"
 
-    if tar_file_name(aid):
+    if tar_file_exists(aid):
         if verbose: print "Using cached copy of tar file"
         return False
     else:
-        with util.remember_cwd():            
-            tar_base = tar_file_name_base(aid)
-            dir, fn = os.path.split(tar_base)
-            ensure_dirs_exist(tar_base)
-            os.chdir(dir)
-            subprocess.call(fetch_command(aid))
+        tar_base = tar_file_path_without_extension(aid)
+        ensure_dirs_exist(tar_base)
+        subprocess.call(fetch_command(aid))
 
-            # rename file to have correct extension
-            if is_pdf(tar_file_name_base(aid)):
-                shutil.move(tar_base, tar_base + '.pdf')
-            elif is_gzip(tar_file_name_base(aid)):
-                shutil.move(tar_base, tar_base + '.gz')                
-            # bare tar files don't appear in "official" archive, don't
-            # create them here.
-            #elif is_uncompressed_tar_file(tar_file_name_base(aid)):
-            #    shutil.move(tar_base, tar_base + '.tar')
-            else:
-                # This should/would be an exception, but it occurs
-                # when downloading the new astro-ph files for the day.
-                # I don't want an unrecognized file to prevent
-                # downloading other papers, so just print a message
-                # and move on.
-                # 
-                # raise RuntimeError, "Unrecognized file %s" % aid
-                print "WARNING: Unrecognized file type for %s!" % aid
+        # rename file to have correct extension
+        if is_pdf(tar_base):
+            shutil.move(tar_base, tar_base + '.pdf')
+        elif is_gzip(tar_base):
+            shutil.move(tar_base, tar_base + '.gz')                
+        # bare tar files don't appear in "official" archive, don't
+        # create them here.
+        #elif is_uncompressed_tar_file(tar_file_name_base(aid)):
+        #    shutil.move(tar_base, tar_base + '.tar')
+        else:
+            # This should/would be an exception, but it occurs
+            # when downloading the new astro-ph files for the day.
+            # I don't want an unrecognized file to prevent
+            # downloading other papers, so just print a message
+            # and move on.
+            # 
+            # raise RuntimeError, "Unrecognized file %s" % aid
+            print "WARNING: Unrecognized file type for %s!" % aid
         return True
 
 def get_all_latex(aids):
@@ -244,20 +243,20 @@ def get_all_latex(aids):
 def get_latex(aid):
     "Get latex out of tar file"
     # Should clean up directory!
-    path_name = tar_file_name(aid)
-    if not path_name:
+    if not tar_file_exists(aid):
         # could just try to grab the file from arxiv.org here.  
         raise ValueError, "File not found for %s!" % aid 
+    path_name = tar_file_path(aid)
     tmpdir = tempfile.mkdtemp()    
-    shutil.copy(path_name, os.path.join(tmpdir))
+    shutil.copy(path_name, tmpdir)
     with util.remember_cwd():
-        # All of this is taking place in a temp dir
-        # Strip off path names
-        base_path_name = tar_file_name_base(aid)    
-        junk, base_fn = os.path.split(base_path_name)
-        junk, ext_fn = os.path.split(path_name)
-
+        # All of this is taking place in a temp dir, so I only want
+        # filenames, not paths.
         os.chdir(tmpdir)
+
+        base_fn = file_name_base(aid)
+        ext_fn = tar_file_name(aid)
+        
         # gunzip if necessary
         if is_gzip(ext_fn):
             if verbose: print "Decompressing", aid            

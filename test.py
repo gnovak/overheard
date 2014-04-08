@@ -99,11 +99,11 @@ class FetchTest(unittest.TestCase):
 
     def test_tar_file_extension(self):
         for aid in test_aids:
-            tar_file_extension(aid)
+            fetch.tar_file_extension(aid)
 
     def test_tar_file_exists(self):
         for aid in test_aids:
-            tar_file_exists(aid)
+            fetch.tar_file_exists(aid)
 
     def test_tar_file_name(self):
         for aid in test_aids:
@@ -113,9 +113,9 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.tar_file_path(aid)
 
-    def test_tar_file_name_base(self):
+    def test_tar_file_path_without_extension(self):
         for aid in test_aids:
-            fetch.tar_file_name_base(aid)
+            fetch.tar_file_path_without_extension(aid)
 
     def test_file_type_string(self):        
         fetch.file_type_string(test_file)
