@@ -10,6 +10,9 @@ def remember_cwd():
 
 ### Code snippet from gsn_util package
 ### https://pypi.python.org/pypi/gsn_util/
+#
+# These were used for caching the rss feed, but they're not currently used anywhere.
+# 
 def can(obj, file, protocol=2):
     """More convenient syntax for pickle, intended for interactive use
 
