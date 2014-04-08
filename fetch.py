@@ -57,7 +57,7 @@ def gunzip_command(fn):
 
 def file_name_base(aid):
     "Filename of latex/tar file for archive paper without the extension"
-    if arxiv_id.new(aid): 
+    if arxiv_id.is_new(aid): 
         fn_base = aid
     else: 
         # Ugh, four function calls when I could just grab the regexp

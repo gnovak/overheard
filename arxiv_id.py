@@ -16,11 +16,11 @@ new_regexp = '^()([0-9]{4}).([0-9]{4})(v[0-9]+)?$'
 
 # Match fields for both are are section name, yymm, number, version
 
-def old(aid):
+def is_old(aid):
     "Is this an old-style arxiv id?"    
     return re.search(old_regexp, aid)
 
-def new(aid):
+def is_new(aid):
     "Is this an new-style arxiv id?"
     return re.search(new_regexp, aid)
 

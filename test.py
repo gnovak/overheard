@@ -171,87 +171,87 @@ class UtilTest(unittest.TestCase):
 
 class ArchivTest(unittest.TestCase):
 
-    def test_arxiv_id_old(self):
+    def test_old(self):
         # good ids
-        self.assertTrue(arxiv_id.old('astro-ph/1234567'))
-        self.assertTrue(arxiv_id.old('astro-ph/1234567v1'))
-        self.assertTrue(arxiv_id.old('astro-ph/1234567v12'))
+        self.assertTrue(arxiv_id.is_old('astro-ph/1234567'))
+        self.assertTrue(arxiv_id.is_old('astro-ph/1234567v1'))
+        self.assertTrue(arxiv_id.is_old('astro-ph/1234567v12'))
 
         # too short
-        self.assertFalse(arxiv_id.old('astro-ph/123456'))
-        self.assertFalse(arxiv_id.old('astro-ph/1234567v'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/123456'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567v'))
 
         # too long
-        self.assertFalse(arxiv_id.old('astro-ph/12345678'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/12345678'))
 
         # wrong letter
-        self.assertFalse(arxiv_id.old('astro-ph/1234567a1'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567a1'))
 
         # junk at start
-        self.assertFalse(arxiv_id.old('astro-ph/a1234567'))
-        self.assertFalse(arxiv_id.old('astro-ph/a1234567v1'))
-        self.assertFalse(arxiv_id.old('astro-ph/a1234567v12'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/a1234567'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/a1234567v1'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/a1234567v12'))
 
         # junk at end
-        self.assertFalse(arxiv_id.old('astro-ph/1234567a'))
-        self.assertFalse(arxiv_id.old('astro-ph/1234567v1a'))
-        self.assertFalse(arxiv_id.old('astro-ph/1234567v12a'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567a'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567v1a'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567v12a'))
 
         # two versions
-        self.assertFalse(arxiv_id.old('astro-ph/1234567v1v2'))
+        self.assertFalse(arxiv_id.is_old('astro-ph/1234567v1v2'))
 
         # No archive name
-        self.assertFalse(arxiv_id.old('/1234567v1v2'))
+        self.assertFalse(arxiv_id.is_old('/1234567v1v2'))
 
         # No slash
-        self.assertFalse(arxiv_id.old('astro-ph1234567v1v2'))
+        self.assertFalse(arxiv_id.is_old('astro-ph1234567v1v2'))
 
-    def test_arxiv_old_id_parse(self):
+    def test_old_id_parse(self):
         self.assertEqual(arxiv_id.archive('astro-ph/1234567v12'), 'astro-ph')
         self.assertEqual(arxiv_id.yymm('astro-ph/1234567v12'), '1234')
         self.assertEqual(arxiv_id.number('astro-ph/1234567v12'), '567')
         self.assertEqual(arxiv_id.version('astro-ph/1234567v12'), 'v12')
         self.assertEqual(arxiv_id.version('astro-ph/1234567'), '')
 
-    def test_arxiv_new_id_parse(self):
+    def test_new_id_parse(self):
         self.assertEqual(arxiv_id.archive('1234.5678v12'), '')
         self.assertEqual(arxiv_id.yymm('1234.5678v12'), '1234')
         self.assertEqual(arxiv_id.number('1234.5678v12'), '5678')
         self.assertEqual(arxiv_id.version('1234.5678v12'), 'v12')
         self.assertEqual(arxiv_id.version('1234.5678'), '')
 
-    def test_arxiv_id_new(self):
+    def test_is_new(self):
         # good ids
-        self.assertTrue(arxiv_id.new('1234.5678'))
-        self.assertTrue(arxiv_id.new('1234.5678v1'))
-        self.assertTrue(arxiv_id.new('1234.5678v12'))
+        self.assertTrue(arxiv_id.is_new('1234.5678'))
+        self.assertTrue(arxiv_id.is_new('1234.5678v1'))
+        self.assertTrue(arxiv_id.is_new('1234.5678v12'))
 
         # wrong delimiter
-        self.assertTrue(arxiv_id.new('1234a5678'))
+        self.assertTrue(arxiv_id.is_new('1234a5678'))
 
         # too short
-        self.assertFalse(arxiv_id.new('123.5678'))
-        self.assertFalse(arxiv_id.new('1234.567'))
-        self.assertFalse(arxiv_id.new('1234.5678v'))
+        self.assertFalse(arxiv_id.is_new('123.5678'))
+        self.assertFalse(arxiv_id.is_new('1234.567'))
+        self.assertFalse(arxiv_id.is_new('1234.5678v'))
 
         # too long
-        self.assertFalse(arxiv_id.new('1234.56788'))
+        self.assertFalse(arxiv_id.is_new('1234.56788'))
 
         # wrong letter
-        self.assertFalse(arxiv_id.new('1234.5678a1'))
+        self.assertFalse(arxiv_id.is_new('1234.5678a1'))
 
         # junk at start
-        self.assertFalse(arxiv_id.new('a1234.5678'))
-        self.assertFalse(arxiv_id.new('a1234.5678v1'))
-        self.assertFalse(arxiv_id.new('a1234.5678v12'))
+        self.assertFalse(arxiv_id.is_new('a1234.5678'))
+        self.assertFalse(arxiv_id.is_new('a1234.5678v1'))
+        self.assertFalse(arxiv_id.is_new('a1234.5678v12'))
 
         # junk at end
-        self.assertFalse(arxiv_id.new('1234.5678a'))
-        self.assertFalse(arxiv_id.new('1234.5678v1a'))
-        self.assertFalse(arxiv_id.new('1234.5678v12a'))
+        self.assertFalse(arxiv_id.is_new('1234.5678a'))
+        self.assertFalse(arxiv_id.is_new('1234.5678v1a'))
+        self.assertFalse(arxiv_id.is_new('1234.5678v12a'))
 
         # two versions
-        self.assertFalse(arxiv_id.new('1234.5678v1v2'))
+        self.assertFalse(arxiv_id.is_new('1234.5678v1v2'))
 
 class ScrapeTest(unittest.TestCase):
 
