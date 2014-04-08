@@ -72,12 +72,12 @@ def latex_file_name(aid):
 def tar_file_name_base(aid):
     return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
 
-def tar_file_name(aid, with_extension=True):
+def tar_file_name(aid):
     "Filename of tar file for archive paper"
     # Get the name of the tar file.  This is complicated by the fact
     # that it may have different extensions based on file type.
     
-    valid_extensions = ['.gz', '.tar', '.pdf']
+    valid_extensions = ['.gz', '.pdf']
 
     paths = [tar_file_name_base(aid) + ext 
              for ext in valid_extensions]
