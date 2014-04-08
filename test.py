@@ -23,6 +23,15 @@ test_delay = 5
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
 
+# Old-style id, cases I want to be sure are handled.
+#astro-ph0701006.pdf: PDF document, version 1.5
+#astro-ph0701001.gz:  gzip compressed data, was "0701001.tar", from Unix, last modified: Fri Jan 19 05:47:49 2007, max compression
+#astro-ph0701019.gz:  gzip compressed data, was "paper.tex", from Unix, last modified: Sun Dec 31 21:01:20 2006, max compression
+# New style, common cases
+# 1211.0027.pdf: PDF document, version 1.5
+# 1211.0038.gz:  gzip compressed data, was "1211.3016.tar", from Unix, last modified: Thu Nov 15 16:06:56 2012, max compression
+# 1211.0004.gz:  gzip compressed data, was "razmyshl_11_20.tex", from Unix, last modified: Thu Nov 22 04:38:00 2012, max speed
+
 class OverheardTest(unittest.TestCase):
 
     def setUp(self):

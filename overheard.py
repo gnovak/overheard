@@ -1,3 +1,15 @@
+# Convert to "official" dir tree 
+# - files have extensions... put them on when downloading?
+# - old-style ones prefix the archive
+# - new-style ones do not prefix the arxiv
+# - eventually expand concept of aid to include archive name
+# - add 3 types: tar, gzip pdf, gzip tex for each of old/new aids to tests
+# - make wget redirect to /dev/null via --output-file
+# - Move user agent string to config file.
+#
+# Handle versions
+# - ???
+#
 # Ideas:
 # - add force option to fetch.fetch_latex
 # - fix fetch.fetch_latex and fetch.get_latex names
@@ -34,6 +46,8 @@
 #  0408420vN gives version N
 #  0408420vN if N > number of versions gives most recent version
 
+# Command to download arxiv sources
+# s3cmd sync --add-header="x-amz-request-payer: requester" s3://arxiv/src/ .
 
 # Split into:
 # map arxiv id to path
@@ -45,7 +59,6 @@
 # Shell commands...?
 # RSS feed/downloading new papers
 # main
-
 
 import os, datetime
 
