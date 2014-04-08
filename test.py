@@ -37,13 +37,10 @@ class OverheardTest(unittest.TestCase):
 
     def setUp(self):
         self.fetch_verbose_setting = fetch.verbose
-        self.update_verbose_setting = update.verbose
         fetch.verbose = False
-        update.verbose = False
 
     def tearDown(self):
         fetch.verbose = self.fetch_verbose_setting
-        update.verbose = self.update_verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_main(self):
@@ -141,16 +138,10 @@ class FetchTest(unittest.TestCase):
     
 
 class UpdateTest(unittest.TestCase):
-    def setUp(self):
-        self.verbose_setting = update.verbose
-        update.verbose = False
-
-    def tearDown(self):
-        update.verbose = self.verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_fetch_rss_maybe(self): 
-        update.fetch_rss_maybe()
+    def test_fetch_rss(self): 
+        update.fetch_rss()
     
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_parse_rss_feed_maybe(self): 

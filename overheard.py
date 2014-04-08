@@ -6,6 +6,14 @@
 # - add 3 types: tar, gzip pdf, gzip tex for each of old/new aids to tests
 # - make wget redirect to /dev/null via --output-file
 # - Move user agent string to config file.
+# - Move paths to latex and data dirs to config file
+# - Detect if I'm getting stonewalled by arxiv.org
+# - Allow partial line /full line to be "long comment"?
+# - Need a function that takes a directory + returns a list of arxiv
+#   ids to support mass latex extraction
+# - Package up into "official" python package
+# - Keep record of which comments came from which papers?
+# - Start downloading all papers, not just astro-ph
 #
 # Handle versions
 # - ???
