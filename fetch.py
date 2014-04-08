@@ -1,3 +1,70 @@
+#########
+# Notes #
+#########
+# 
+# The conventions for storing latex source archives files are taken
+# from those used in the bulk data made available by arxiv.org via
+# Amazon.com's S3 service.  This makes it possible to download a bunch
+# of source files, untar them, and start working on the data without
+# pre-processing the files in any way.
+# 
+# Information here: http://arxiv.org/help/bulk_data_s3
+# 
+# Command to bulk download arxiv sources to the current directory
+# s3cmd sync --add-header="x-amz-request-payer: requester" s3://arxiv/src/ .
+#
+# The entire archive is divided into sub-directories by YYMM.  Files
+# in each directory can be pdf files or gzip files.  The gunzipped
+# file can be any number of things: latex source, a tar file,
+# postscript, html, plain text, (and more?).  It might have been nice
+# if the pdf files were gzipped so that _everything_ could be handled
+# the same way (gunzip, figure out what it is, act appropriately), but
+# the arxiv.org people have decided not to do that.  It's true that
+# PDF files are already compressed, so gzipping them is kind of a
+# waste.
+# 
+# However, when you download a paper via
+# http://arxiv.org/e-print/identifier, you don't know if the file will
+# be a PDF or a gzip file, and the resulting file has no extension.
+# Therefore when fetching papers (from the arxiv.org RSS feed, for
+# instance), the code below looks at the file type and puts the
+# appropriate extension so that it goes into the data directory just
+# like the bulk data provided by arxiv.org via S3.  
+#
+# Thus when you ask for the name of the data file associated with an
+# arxiv id, you may want it without an extension (if it was downloaded
+# via wget and you want to put the appropriate extension on), or you
+# may want it _with_ the extension (in which case the code must look
+# to see if it's a pdf or gz file, and give you the correct filename).
+# 
+# Note that it's necessary to call 'file' on the gunzipped file.
+# Calling 'file' on the gzipped file allows you to figure out what's
+# inside most of the time, but sometimes the results are hilariously
+# wrong.  All of these contain valid latex:
+#   1211.0074.gz:  Minix filesystem, V2, 51878 zones
+#   cond-mat0701210.gz:  gzip compressed data, was "/data/new/0022/0022418/src/with", 
+#   math0701257.gz:      x86 boot sector, code offset 0x8b
+#
+# Even calling file on the gunzipped file is bizarrly incorrect
+# sometimes -- files are listed as C++, plain text (when they're
+# latex), or even 'data'.  As long as the output of 'file' has the
+# word 'text' in it, I treat it as latex.  
+#
+# All of these are listed as 'data' after gunzipping, even though it
+# looks like fine latex to me.
+# 
+# 1303.5083 1401.5069 1401.5758 1401.5838 1401.6077 1401.6577
+# 1401.7056 1402.0695 1402.0700 1402.1495 1402.1968 1402.5880
+# 1403.2389 1403.3804
+# 
+# archive.org Won't accept wget user agent string, can be anything else
+# 
+# Fetching source files (same for old and new archive identifiers)
+#  0408420 gives most recent
+#  0408420vN gives version N
+#  0408420vN if N > number of versions gives most recent version
+#
+
 import os, subprocess, tempfile, shutil, re, time
 
 import path, util, arxiv_id
@@ -41,7 +108,7 @@ def fetch_command(aid):
     "Give the command to fetch latex source file"
     # Direct this to file I want to avoid fussing around with incoming_tar_file_name()
     return (["wget",  "-U 'overheard'", 
-             "--output-document", tar_file_path_without_extension(aid)] + 
+             "--output-document", source_file_path_without_extension(aid)] + 
             ([] if verbose else ["--output-file", "/dev/null"]) + 
             [arxiv_to_url(aid)])
             
@@ -65,7 +132,7 @@ def gunzip_command(fn):
 #    subprocess.call(gunzip_command(aid))
 
 def file_name_base(aid):
-    "Filename of latex/tar file for archive paper without the extension"
+    "Filename of latex/source file for an arxiv id without the extension"
     if arxiv_id.is_new(aid): 
         fn_base = aid
     else: 
@@ -84,35 +151,35 @@ def latex_file_path(aid):
     "Filename of latex source file for archive paper"
     return os.path.join(path.latex, dir_prefix(aid), latex_file_name(aid))
 
-def tar_file_name(aid):
-    "Filename of tar file for archive paper"
-    ext = tar_file_extension(aid)
+def source_file_name(aid):
+    "Filename of source file for archive paper"
+    ext = source_file_extension(aid)
     if not ext:
         raise RuntimeError, "No files exist for %s" % aid 
     return file_name_base(aid) + ext
 
-def tar_file_path(aid):
-    "Filename of tar file for archive paper"
-    return os.path.join(path.tar, dir_prefix(aid), tar_file_name(aid))
+def source_file_path(aid):
+    "Filename of source file for archive paper"
+    return os.path.join(path.source, dir_prefix(aid), source_file_name(aid))
 
-def tar_file_path_without_extension(aid):
+def source_file_path_without_extension(aid):
     # This is used just after downloading a file, when it doesn't have
     # the correct extension yet b/c we don't know the file type.
-    return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
+    return os.path.join(path.source, dir_prefix(aid), file_name_base(aid))
 
-def tar_file_exists(aid):
-    """Determine if the tar file associated with an arxiv id exists."""
-    return tar_file_extension(aid) 
+def source_file_exists(aid):
+    """Determine if the source file associated with an arxiv id exists."""
+    return source_file_extension(aid) 
 
-def tar_file_extension(aid):
-    """Return the extension of the tar file associated with an arxiv id.
+def source_file_extension(aid):
+    """Return the extension of the source file associated with an arxiv id.
 
     Return False if the file doesn't exist.
 
     """
     valid_extensions = ['.gz', '.pdf']
 
-    paths = [tar_file_path_without_extension(aid) + ext 
+    paths = [source_file_path_without_extension(aid) + ext 
              for ext in valid_extensions]
     exist = [os.path.isfile(pp) for pp in paths]
     n_exist = exist.count(True)
@@ -157,21 +224,21 @@ def fetch_all_latex(aids, delay=60):
             time.sleep(delay)
 
 def fetch_latex(aid):
-    "Get tar file from archive.org unless we already have it"
+    "Get source file from archive.org unless we already have it"
 
-    if tar_file_exists(aid):
-        if verbose: print "Using cached copy of tar file"
+    if source_file_exists(aid):
+        if verbose: print "Using cached copy of source file"
         return False
     else:
-        tar_base = tar_file_path_without_extension(aid)
-        ensure_dirs_exist(tar_base)
+        source_base = source_file_path_without_extension(aid)
+        ensure_dirs_exist(source_base)
         subprocess.call(fetch_command(aid))
 
         # rename file to have correct extension
-        if is_pdf(tar_base):
-            shutil.move(tar_base, tar_base + '.pdf')
-        elif is_gzip(tar_base):
-            shutil.move(tar_base, tar_base + '.gz')                
+        if is_pdf(source_base):
+            shutil.move(source_base, source_base + '.pdf')
+        elif is_gzip(source_base):
+            shutil.move(source_base, source_base + '.gz')                
         # bare tar files don't appear in "official" archive, don't
         # create them here.
         #elif is_uncompressed_tar_file(tar_file_name_base(aid)):
@@ -241,12 +308,12 @@ def get_all_latex(aids):
 # 1403.3804.tex: data
 
 def get_latex(aid):
-    "Get latex out of tar file"
+    "Get latex out of source file"
     # Should clean up directory!
-    if not tar_file_exists(aid):
+    if not source_file_exists(aid):
         # could just try to grab the file from arxiv.org here.  
         raise ValueError, "File not found for %s!" % aid 
-    path_name = tar_file_path(aid)
+    path_name = source_file_path(aid)
     tmpdir = tempfile.mkdtemp()    
     shutil.copy(path_name, tmpdir)
     with util.remember_cwd():
@@ -255,7 +322,7 @@ def get_latex(aid):
         os.chdir(tmpdir)
 
         base_fn = file_name_base(aid)
-        ext_fn = tar_file_name(aid)
+        ext_fn = source_file_name(aid)
         
         # gunzip if necessary
         if is_gzip(ext_fn):

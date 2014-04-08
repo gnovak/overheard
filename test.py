@@ -97,25 +97,25 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.file_name_base(aid)
 
-    def test_tar_file_extension(self):
+    def test_source_file_extension(self):
         for aid in test_aids:
-            fetch.tar_file_extension(aid)
+            fetch.source_file_extension(aid)
 
-    def test_tar_file_exists(self):
+    def test_source_file_exists(self):
         for aid in test_aids:
-            fetch.tar_file_exists(aid)
+            fetch.source_file_exists(aid)
 
-    def test_tar_file_name(self):
+    def test_source_file_name(self):
         for aid in test_aids:
-            fetch.tar_file_name(aid)
+            fetch.source_file_name(aid)
 
-    def test_tar_file_path(self):
+    def test_source_file_path(self):
         for aid in test_aids:
-            fetch.tar_file_path(aid)
+            fetch.source_file_path(aid)
 
-    def test_tar_file_path_without_extension(self):
+    def test_source_file_path_without_extension(self):
         for aid in test_aids:
-            fetch.tar_file_path_without_extension(aid)
+            fetch.source_file_path_without_extension(aid)
 
     def test_file_type_string(self):        
         fetch.file_type_string(test_file)
