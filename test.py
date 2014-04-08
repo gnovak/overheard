@@ -89,11 +89,6 @@ class FetchTest(unittest.TestCase):
     def test_gunzip_command(self):
         fetch.gunzip_command("fake.gz")
 
-    # FIXME -- this is set to run in particular dir
-    # def test_gunzip(self):
-    # for aid in test_aids:
-    #     fetch.gunzip(aid)
-
     def test_latex_file_name(self):
         for aid in test_aids:
             fetch.latex_file_name(aid)

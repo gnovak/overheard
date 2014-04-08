@@ -42,7 +42,9 @@ def decompress_command(fn):
 
 def gunzip_command(fn):
     "Give the command to decompress a latex source file."    
-    # This takes place in a temporary directory: don't pass the full path, only the filename
+    # This takes place in a temporary directory: don't pass the full
+    # path, only the filename
+    # 
     #path_name = tar_file_name(aid)
     #path, fn = os.path.split(path_name)
     return ["gunzip",  fn]
@@ -119,17 +121,6 @@ def is_other_file(aid):
     # This is so if a file type is totally unknown, we can print a
     # message and catch it.
     return False
-
-#def is_valid_latex(aid):
-#    return (is_uncompressed_tar_file(aid) or
-#            is_gzipped_tar_file(aid) or
-#            is_gzipped_tex_file(aid))
-
-#def is_valid_non_latex(aid):
-#    return is_pdf(aid)
-
-#def is_unknown(aid):    
-#    return not (is_valid_latex(aid) or is_valid_non_latex(aid))
 
 def fetch_all_latex(aids, delay=60):
     for aid in aids:
@@ -227,7 +218,6 @@ def get_all_latex(aids):
 def get_latex(aid):
     "Get latex out of tar file"
     # Should clean up directory!
-    # make things simpler by copying tar file to temp dir
     path_name = tar_file_name(aid)
     if not path_name:
         # could just try to grab the file from arxiv.org here.  

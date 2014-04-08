@@ -79,11 +79,3 @@ def write_output(aids, long_outfn, short_outfn):
                 outf.write('\n')
     
 
-# def all_comments(aid):
-#     "Get comments out of latex file"
-#     with open(fetch.latex_file_name(aid)) as ff:
-#         lines = ff.readlines()
-#     the_short_comments = short_comments(lines)
-#     the_long_comments = long_comments(lines)        
-#     return the_short_comments, the_long_comments
-
