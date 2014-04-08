@@ -93,6 +93,14 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.file_name_base(aid)
 
+    def test_tar_file_extension(self):
+        for aid in test_aids:
+            tar_file_extension(aid)
+
+    def test_tar_file_exists(self):
+        for aid in test_aids:
+            tar_file_exists(aid)
+
     def test_tar_file_name(self):
         for aid in test_aids:
             fetch.tar_file_name(aid)

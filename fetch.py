@@ -82,11 +82,16 @@ def latex_file_name(aid):
 def tar_file_name_base(aid):
     return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
 
-def tar_file_name(aid):
-    "Filename of tar file for archive paper"
-    # Get the name of the tar file.  This is complicated by the fact
-    # that it may have different extensions based on file type.
-    
+def tar_file_exists(aid):
+    """Determine if the tar file associated with an arxiv id exists."""
+    return tar_file_extension(aid) 
+
+def tar_file_extension(aid):
+    """Return the extension of the tar file associated with an arxiv id.
+
+    Return False if the file doesn't exist.
+
+    """
     valid_extensions = ['.gz', '.pdf']
 
     paths = [tar_file_name_base(aid) + ext 
@@ -97,12 +102,16 @@ def tar_file_name(aid):
     if n_exist > 1:
         raise RuntimeError, "More than one file exists for" % aid
     elif n_exist == 0:
-        # This is also used to check if the tar file exists, so if it
-        # doesn't just return False without an exception.
-        #
-        # raise RuntimeError, "No files exist for %s" % aid 
         return False
-    return paths[exist.index(True)]
+        
+    return valid_extensions[exist.index(True)]
+
+def tar_file_name(aid):
+    "Filename of tar file for archive paper"
+    ext = tar_file_extension(aid)
+    if not ext:
+        raise RuntimeError, "No files exist for %s" % aid 
+    return tar_file_name_base(aid) + ext
 
 def file_type_string(fn):
     "Find out what kind of file it is."
