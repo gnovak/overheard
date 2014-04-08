@@ -101,28 +101,35 @@ def file_type_string(fn):
     stdout, stderr = pipe.communicate()
     return stdout
 
-def is_uncompressed_tar_file(aid):
-    return re.search('tar', file_type_string(aid))
+def is_uncompressed_tar_file(fn):
+    return re.search('tar archive', file_type_string(fn))
 
-def is_gzipped_tar_file(aid):
-    return re.search('gzip compressed data, from', file_type_string(aid))
+def is_gzip_file(fn):
+    return re.search('gzip compressed data', file_type_string(fn))
 
-def is_gzipped_tex_file(aid):
-    return re.search('gzip compressed data, was', file_type_string(aid))
+def is_pdf_file(fn):
+    return re.search('PDF document', file_type_string(fn))
 
-def is_pdf(aid):
-    return re.search('PDF', file_type_string(aid))
+def is_tex_file(fn):
+    # Accept anything with the word 'text' in it.
+    return re.search('text', file_type_string(fn))
 
-def is_valid_latex(aid):
-    return (is_uncompressed_tar_file(aid) or
-            is_gzipped_tar_file(aid) or
-            is_gzipped_tex_file(aid))
+def is_other_file(aid):
+    # File types that are known, but that we can't do anything with
+    # This is so if a file type is totally unknown, we can print a
+    # message and catch it.
+    return False
 
-def is_valid_non_latex(aid):
-    return is_pdf(aid)
+#def is_valid_latex(aid):
+#    return (is_uncompressed_tar_file(aid) or
+#            is_gzipped_tar_file(aid) or
+#            is_gzipped_tex_file(aid))
 
-def is_unknown(aid):    
-    return not (is_valid_latex(aid) or is_valid_non_latex(aid))
+#def is_valid_non_latex(aid):
+#    return is_pdf(aid)
+
+#def is_unknown(aid):    
+#    return not (is_valid_latex(aid) or is_valid_non_latex(aid))
 
 def fetch_all_latex(aids, delay=60):
     for aid in aids:
