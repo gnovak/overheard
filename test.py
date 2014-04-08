@@ -89,6 +89,10 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.latex_file_name(aid)
 
+    def test_latex_file_path(self):
+        for aid in test_aids:
+            fetch.latex_file_path(aid)
+
     def test_file_name_base(self):
         for aid in test_aids:
             fetch.file_name_base(aid)
@@ -104,6 +108,10 @@ class FetchTest(unittest.TestCase):
     def test_tar_file_name(self):
         for aid in test_aids:
             fetch.tar_file_name(aid)
+
+    def test_tar_file_path(self):
+        for aid in test_aids:
+            fetch.tar_file_path(aid)
 
     def test_tar_file_name_base(self):
         for aid in test_aids:

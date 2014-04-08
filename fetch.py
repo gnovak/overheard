@@ -77,10 +77,26 @@ def file_name_base(aid):
 
 def latex_file_name(aid):
     "Filename of latex source file for archive paper"
-    return os.path.join(path.latex, dir_prefix(aid), file_name_base(aid) + '.tex')
+    return file_name_base(aid) + '.tex'
 
+def latex_file_path(aid):
+    "Filename of latex source file for archive paper"
+    return os.path.join(path.latex, dir_prefix(aid), latex_file_name(aid))
+
+def tar_file_name(aid):
+    "Filename of tar file for archive paper"
+    ext = tar_file_extension(aid)
+    if not ext:
+        raise RuntimeError, "No files exist for %s" % aid 
+    return tar_file_name_base(aid) + ext
+
+def tar_file_path(aid):
+    "Filename of tar file for archive paper"
+    return os.path.join(path.tar, dir_prefix(aid), tar_file_name(aid))
+
+# Want to get rid of this function
 def tar_file_name_base(aid):
-    return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
+   return os.path.join(path.tar, dir_prefix(aid), file_name_base(aid))
 
 def tar_file_exists(aid):
     """Determine if the tar file associated with an arxiv id exists."""
@@ -105,13 +121,6 @@ def tar_file_extension(aid):
         return False
         
     return valid_extensions[exist.index(True)]
-
-def tar_file_name(aid):
-    "Filename of tar file for archive paper"
-    ext = tar_file_extension(aid)
-    if not ext:
-        raise RuntimeError, "No files exist for %s" % aid 
-    return tar_file_name_base(aid) + ext
 
 def file_type_string(fn):
     "Find out what kind of file it is."
