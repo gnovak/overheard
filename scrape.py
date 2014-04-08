@@ -16,7 +16,7 @@ short_comment_regexp = '.*?(%.*)$'
 def long_comments(aid):
     "Get long comments out of latex file"
 
-    with open(fetch.latex_file_name(aid)) as ff:
+    with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
     # State variable
@@ -51,7 +51,7 @@ def long_comments(aid):
 
 def short_comments(aid):
     "Get short comments out of latex file"
-    with open(fetch.latex_file_name(aid)) as ff:
+    with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
     result = []

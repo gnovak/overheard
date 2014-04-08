@@ -284,7 +284,7 @@ def get_latex(aid):
         
         # If there are no latex files, an empty file should be
         # generated to avoid later file not found errors.        
-        latex_fn = latex_file_name(aid)
+        latex_fn = latex_file_path(aid)
         ensure_dirs_exist(latex_fn)
         with open(latex_fn, 'w') as outf:
             if latex_files:
