@@ -4,8 +4,10 @@ import arxiv_id, scrape, util, update, fetch, overheard
 
 network_tests = True
 
-test_aid = '1401.0059'
+# Actually want two of these, one old, one new.
+test_aids = ['1401.0059', 'astro-ph/9909321']
 test_delay = 5
+test_file = "overheard.py"
 
 # Run all tests from command line
 #   python test.py
@@ -21,6 +23,15 @@ test_delay = 5
 # Run specific test interactively from REPL
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
+
+# Old-style id, cases I want to be sure are handled.
+#astro-ph0701006.pdf: PDF document, version 1.5
+#astro-ph0701001.gz:  gzip compressed data, was "0701001.tar", from Unix, last modified: Fri Jan 19 05:47:49 2007, max compression
+#astro-ph0701019.gz:  gzip compressed data, was "paper.tex", from Unix, last modified: Sun Dec 31 21:01:20 2006, max compression
+# New style, common cases
+# 1211.0027.pdf: PDF document, version 1.5
+# 1211.0038.gz:  gzip compressed data, was "1211.3016.tar", from Unix, last modified: Thu Nov 15 16:06:56 2012, max compression
+# 1211.0004.gz:  gzip compressed data, was "razmyshl_11_20.tex", from Unix, last modified: Thu Nov 22 04:38:00 2012, max speed
 
 class OverheardTest(unittest.TestCase):
 
@@ -59,68 +70,79 @@ class FetchTest(unittest.TestCase):
     def test_extension(self):
         fetch.extension('filename.txt')
 
+    def test_ensure_dir_exists(self):
+        #the_dir = os.path.join(tempfile.mkdtemp(), 'aaa', 'bbb', 'file.txt')
+        the_dir = os.path.join(tempfile.mkdtemp(), 'aaa')
+        fetch.ensure_dir_exists(the_dir)
+
     def test_arxiv_to_url(self):
-        fetch.arxiv_to_url(test_aid)
+        for aid in test_aids:
+            fetch.arxiv_to_url(aid)
 
     def test_fetch_command(self):
-        fetch.fetch_command(test_aid)
+        for aid in test_aids:
+            fetch.fetch_command(aid)
 
     def test_decompress_command(self):
-        fetch.decompress_command(test_aid)
-
+        fetch.decompress_command("fake.tar")
+            
     def test_gunzip_command(self):
-        fetch.gunzip_command(test_aid)
+        fetch.gunzip_command("fake.gz")
 
     # FIXME -- this is set to run in particular dir
     # def test_gunzip(self):
-    #     fetch.gunzip(test_aid)
+    # for aid in test_aids:
+    #     fetch.gunzip(aid)
 
     def test_latex_file_name(self):
-        fetch.latex_file_name(test_aid)
+        for aid in test_aids:
+            fetch.latex_file_name(aid)
+
+    def test_file_name_base(self):
+        for aid in test_aids:
+            fetch.file_name_base(aid)
 
     def test_tar_file_name(self):
-        fetch.tar_file_name(test_aid)
+        for aid in test_aids:
+            fetch.tar_file_name(aid)
 
-    def test_file_type_string(self):
-        fetch.file_type_string(test_aid)
+    def test_tar_file_name_base(self):
+        for aid in test_aids:
+            fetch.tar_file_name_base(aid)
+
+    def test_file_type_string(self):        
+        fetch.file_type_string(test_file)
 
     def test_is_uncompressed_tar_file(self):
-        fetch.is_uncompressed_tar_file(test_aid)
+        fetch.is_uncompressed_tar_file(test_file)
 
-    def test_is_gzipped_tar_file(self):
-        fetch.is_gzipped_tar_file(test_aid)
+    def test_is_gzip_file(self):
+        fetch.is_gzip_file(test_file)
 
-    def test_is_gzipped_tex_file(self):
-        fetch.is_gzipped_tex_file(test_aid)
+    def test_is_pdf_file(self):
+        fetch.is_pdf_file(test_file)
 
-    def test_is_pdf(self):
-        fetch.is_pdf(test_aid)
+    def test_is_tex_file(self):
+        fetch.is_tex_file(test_file)
 
-    def test_is_valid_latex(self):
-        fetch.is_valid_latex(test_aid)
-
-    def is_valid_latex(self):
-        fetch.is_valid_latex(test_aid)
-
-    def test_is_valid_non_latex(self):
-        fetch.is_valid_non_latex(test_aid)
-
-    def test_is_unknown(self):    
-        fetch.is_unknown(test_aid)
+    def test_is_other_file(self):
+        fetch.is_other_file(test_file)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_all_latex(self):
-        fetch.fetch_all_latex([test_aid], delay=test_delay)
+        fetch.fetch_all_latex(test_aids, delay=test_delay)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_latex(self):
-        fetch.fetch_latex(test_aid)
+        for aid in test_aids:
+            fetch.fetch_latex(aid)
 
     def test_get_all_latex(self):
-        fetch.get_all_latex([test_aid, test_aid])
+        fetch.get_all_latex(test_aids)
 
     def test_get_latex(self):
-        fetch.get_latex(test_aid)
+        for aid in test_aids:
+            fetch.get_latex(aid)
     
 
 class UpdateTest(unittest.TestCase):
@@ -165,32 +187,52 @@ class ArchivTest(unittest.TestCase):
 
     def test_arxiv_id_old(self):
         # good ids
-        self.assertTrue(arxiv_id.old('1234567'))
-        self.assertTrue(arxiv_id.old('1234567v1'))
-        self.assertTrue(arxiv_id.old('1234567v12'))
+        self.assertTrue(arxiv_id.old('astro-ph/1234567'))
+        self.assertTrue(arxiv_id.old('astro-ph/1234567v1'))
+        self.assertTrue(arxiv_id.old('astro-ph/1234567v12'))
 
         # too short
-        self.assertFalse(arxiv_id.old('123456'))
-        self.assertFalse(arxiv_id.old('1234567v'))
+        self.assertFalse(arxiv_id.old('astro-ph/123456'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567v'))
 
         # too long
-        self.assertFalse(arxiv_id.old('12345678'))
+        self.assertFalse(arxiv_id.old('astro-ph/12345678'))
 
         # wrong letter
-        self.assertFalse(arxiv_id.old('1234567a1'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567a1'))
 
         # junk at start
-        self.assertFalse(arxiv_id.old('a1234567'))
-        self.assertFalse(arxiv_id.old('a1234567v1'))
-        self.assertFalse(arxiv_id.old('a1234567v12'))
+        self.assertFalse(arxiv_id.old('astro-ph/a1234567'))
+        self.assertFalse(arxiv_id.old('astro-ph/a1234567v1'))
+        self.assertFalse(arxiv_id.old('astro-ph/a1234567v12'))
 
         # junk at end
-        self.assertFalse(arxiv_id.old('1234567a'))
-        self.assertFalse(arxiv_id.old('1234567v1a'))
-        self.assertFalse(arxiv_id.old('1234567v12a'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567a'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567v1a'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567v12a'))
 
         # two versions
-        self.assertFalse(arxiv_id.old('1234567v1v2'))
+        self.assertFalse(arxiv_id.old('astro-ph/1234567v1v2'))
+
+        # No archive name
+        self.assertFalse(arxiv_id.old('/1234567v1v2'))
+
+        # No slash
+        self.assertFalse(arxiv_id.old('astro-ph1234567v1v2'))
+
+    def test_arxiv_old_id_parse(self):
+        self.assertEqual(arxiv_id.archive('astro-ph/1234567v12'), 'astro-ph')
+        self.assertEqual(arxiv_id.yymm('astro-ph/1234567v12'), '1234')
+        self.assertEqual(arxiv_id.number('astro-ph/1234567v12'), '567')
+        self.assertEqual(arxiv_id.version('astro-ph/1234567v12'), 'v12')
+        self.assertEqual(arxiv_id.version('astro-ph/1234567'), '')
+
+    def test_arxiv_new_id_parse(self):
+        self.assertEqual(arxiv_id.archive('1234.5678v12'), '')
+        self.assertEqual(arxiv_id.yymm('1234.5678v12'), '1234')
+        self.assertEqual(arxiv_id.number('1234.5678v12'), '5678')
+        self.assertEqual(arxiv_id.version('1234.5678v12'), 'v12')
+        self.assertEqual(arxiv_id.version('1234.5678'), '')
 
     def test_arxiv_id_new(self):
         # good ids
@@ -230,20 +272,23 @@ class ScrapeTest(unittest.TestCase):
     # Note that latex file for test_aid must exist
 
     def test_long_comments(self):
-        scrape.long_comments(test_aid)
+        for aid in test_aids:
+            scrape.long_comments(aid)
 
     def test_short_comments(self):
-        scrape.short_comments(test_aid)
+        for aid in test_aids:
+            scrape.short_comments(aid)
 
     def test_write_output(self):
         tf_1 = tempfile.NamedTemporaryFile()
         tf_2 = tempfile.NamedTemporaryFile()
 
-        scrape.write_output([test_aid, test_aid], 
+        scrape.write_output(test_aids, 
                             tf_1.name, tf_2.name)
         
     # def test_all_comments(self):
-    #     scrape.all_comments(test_aid)
+    # for aid in test_aids:
+    #     scrape.all_comments(aid)
 
     def test_long_comment_regexp(self):
         self.assertTrue(re.search(scrape.long_comment_regexp, '% and comment'))
