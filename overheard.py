@@ -90,8 +90,8 @@ def do_it_all(long_outfn, short_outfn, delay=60, nmax=None):
     # should be fetched.
     aids = update.parse_rss()
     if not nmax is None: aids = aids[:min(len(aids), nmax)]
-    fetch.fetch_all_latex(aids, delay=delay)
-    fetch.get_all_latex(aids)    
+    fetch.all_source(aids, delay=delay)
+    fetch.all_latex(aids)    
     scrape.write_output(aids, long_outfn, short_outfn)
 
 def download_todays_papers(delay=60, nmax=None):
@@ -99,7 +99,7 @@ def download_todays_papers(delay=60, nmax=None):
     # should be fetched.
     aids = update.parse_rss()
     if not nmax is None: aids = aids[:min(len(aids), nmax)]
-    fetch.fetch_all_latex(aids, delay=delay)
+    fetch.all_source(aids, delay=delay)
 
 def main(delay=60, prefix='.', nmax=None):
     # nmax is for testing to specify that a small number of papers

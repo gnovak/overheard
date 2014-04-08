@@ -212,16 +212,16 @@ def is_other(aid):
     # message and catch it.
     return False
 
-def fetch_all_latex(aids, delay=60, force=False):
+def all_source(aids, delay=60, force=False):
     any_fetched = False
     for aid in aids:
-        wait = fetch_latex(aid, force=force)
+        wait = source(aid, force=force)
         if wait:
             any_fetched = True
             time.sleep(delay)
     return any_fetched
 
-def fetch_latex(aid, force=False):
+def source(aid, force=False):
     "Get source file from archive.org unless we already have it"
 
     if not force and source_file_exists(aid):
@@ -252,60 +252,11 @@ def fetch_latex(aid, force=False):
             print "WARNING: Unrecognized file type for %s!" % aid
         return True
 
-def get_all_latex(aids):
+def all_latex(aids):
     for aid in aids:
-        get_latex(aid)
+        latex(aid)
 
-
-# Looking at two months worth of actual submissions, what do I learn?
-# - There are two extensions allowed: pdf and gz
-# - The output of 'file' on the gzip files is sometimes bizarrely
-#   incorrect.  See below, which contain valid latex files:
-#  
-#   1211.0074.gz:  Minix filesystem, V2, 51878 zones
-#   cond-mat0701210.gz:  gzip compressed data, was "/data/new/0022/0022418/src/with", 
-#   math0701257.gz:      x86 boot sector, code offset 0x8b
-# 
-# - It's fine to gunzip stuff, it doesn't decompress to the original
-#   filename, but rather from 1234.1234.gz to 1234.1234
-# - After gunzipping, several things can be there:
-#   + latex file
-#   + tar file
-#   + postscript
-#   + pdf (maybe not?)
-#   + html
-#   + text file
-# - So the procedure is:
-#   + gunzip file
-#   + If it's a latex file, rename to *.tex
-#   + If it's a tar file, untar
-#   + Could conceivably scrape html for comments but that doesn't seem
-#     like it will be very fruitful
-#   + Any other file type, I don't really care about.
-#
-#
-# Reliably finding out if something is latex isn't so easy.  All kinds
-# of crazy stuff with comes up with "text" in it.  Sometimes you get
-# 'data' or 'Latex auxilliary file'  Examples below:
-# 
-# 1303.5083.tex: data
-# 1401.5069.tex: data
-# 1401.5758.tex: data
-# 1401.5838.tex: data
-# 1401.6077.tex: data
-# 1401.6577.tex: data
-# 1401.7056.tex: data
-# 1402.0695.tex: data
-# 1402.0700.tex: data
-# 1402.1495.tex: data
-# 1402.1968.tex: data
-# 1402.5880.tex: data
-# 1402.7083.tex: LaTeX auxiliary file
-# 1403.1644.tex: data
-# 1403.2389.tex: data
-# 1403.3804.tex: data
-
-def get_latex(aid):
+def latex(aid):
     "Get latex out of source file"
     # Should clean up directory!
     if not source_file_exists(aid):

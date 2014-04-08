@@ -143,11 +143,11 @@ class FetchTest(unittest.TestCase):
         fetch.is_other(test_file)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_fetch_and_get_all_latex(self):
-        # the exercises fetch_latex, fetch_all_latex, get_latex, and
-        # get_all_latex
-        fetch.fetch_all_latex(test_aids, delay=test_delay, force=True)
-        fetch.get_all_latex(test_aids)
+    def test_fetch_source_and_latex(self):
+        # the exercises fetch.latex, fetch.all_source, fetch.latex, and
+        # fetch.all_latex
+        fetch.all_source(test_aids, delay=test_delay, force=True)
+        fetch.all_latex(test_aids)
     
 
 class UpdateTest(unittest.TestCase):
@@ -278,9 +278,9 @@ class ScrapeTest(unittest.TestCase):
         self.fetch_verbose_setting = fetch.verbose
         fetch.verbose = False
 
-        any_fetched = fetch.fetch_all_latex(test_aids, delay=test_delay)
+        any_fetched = fetch.all_source(test_aids, delay=test_delay)
         if any_fetched: 
-            fetch.get_all_latex(test_aids)
+            fetch.all_latex(test_aids)
 
     def tearDown(self):
         fetch.verbose = self.fetch_verbose_setting
