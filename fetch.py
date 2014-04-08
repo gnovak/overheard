@@ -2,6 +2,14 @@
 # Notes #
 #########
 # 
+# Archive.org won't accept wget user agent string---it can be anything else
+# 
+# When fetching source files from arxiv.org: 
+#  0408420 gives most recent
+#  0408420vN gives version N
+#  0408420vN if N > number of versions gives most recent version
+# (the behavior is same for old and new archive identifiers)
+#
 # The conventions for storing latex source archives files are taken
 # from those used in the bulk data made available by arxiv.org via
 # Amazon.com's S3 service.  This makes it possible to download a bunch
@@ -49,21 +57,46 @@
 # sometimes -- files are listed as C++, plain text (when they're
 # latex), or even 'data'.  As long as the output of 'file' has the
 # word 'text' in it, I treat it as latex.  
-#
-# All of these are listed as 'data' after gunzipping, even though it
-# looks like fine latex to me.
 # 
+# The problem with files not being recognized as latex after
+# gunzipping apparently has to do with text encodings.  Here are a few
+# examples of arxiv id's listed as 'data' after gunzipping.
 # 1303.5083 1401.5069 1401.5758 1401.5838 1401.6077 1401.6577
 # 1401.7056 1402.0695 1402.0700 1402.1495 1402.1968 1402.5880
-# 1403.2389 1403.3804
 # 
-# archive.org Won't accept wget user agent string, can be anything else
-# 
-# Fetching source files (same for old and new archive identifiers)
-#  0408420 gives most recent
-#  0408420vN gives version N
-#  0408420vN if N > number of versions gives most recent version
+# All of the above is for file v5.04 on OS X 10.9.2 Mavaricks.  This
+# version of file dates from about 2010 and I'm writing this in 2014.
+# Going to the latest version of file v5.17 results in improvements in
+# the file type determination for about 300 of the ~3000 files in the
+# entire archive of 1 million papers, so, it's not really worth it.
 #
+# In any case, using file v5.17 installed from MacPorts results in
+# messages like:
+# ERROR: line 163: regex error 17, (illegal byte sequence)
+# This is evidently another text encoding problem and it is discussed here:
+# https://trac.macports.org/ticket/38771
+# A workaround is to set the shell variables:
+# export LC_CTYPE=C 
+# export LANG=C
+# 
+# There's other weird stuff in the files provided by arxiv.org, like
+# PDF files that 'file' reports to be strange things.  All of these
+# are viewable via Emacs DocView and Apple Preview, although when you
+# look at the bytes they do indeed look weird (not like normal PDF
+# files).
+# ./0003/cond-mat0003162.pdf: data
+# ./0304/cond-mat0304406.pdf: MacBinary III data with surprising version number
+# ./0404/physics0404071.pdf: data
+# ./9803/cond-mat9803359.pdf: data
+# ./9805/cond-mat9805146.pdf: data
+# ./0402/cs0402023.pdf: POSIX tar archive (GNU)
+# ./1204/1204.0257.pdf: data
+# ./1204/1204.0258.pdf: data
+# 
+# It takes ~5.5 min to just gunzip everything and untar everything via
+# the shell for one month's sumbissions.  takes ~10 min to do it via
+# python code.  I find this acceptable.
+# 
 
 import sys, os, subprocess, tempfile, shutil, re, time
 
@@ -84,14 +117,13 @@ verbose = True
 # relating that to the filesystem.  The entire archive is partitioned
 # into directories that are just the yymm part of the arxiv id, so
 # just steal that function from the arxiv_id module.
+
 dir_prefix = arxiv_id.yymm
 
 def extension(fn):
     "Get the extension of a filename"
     return os.path.splitext(fn)[1][1:]
 
-# Maybe make this take a full path with filename and create all
-# leading dirs to avoid having to split it apart
 def ensure_dirs_exist(path_name):
     """Ensure that dirs exist to create a file
     
@@ -103,8 +135,7 @@ def ensure_dirs_exist(path_name):
     known to be a directory and the entire path is created if it
     doesn't exist.
 
-    """
-    
+    """    
     dir, fn = os.path.split(path_name)
     if not os.path.isdir(dir):
         os.makedirs(dir)
@@ -117,6 +148,7 @@ def fetch_command(aid, fn):
     "Give the command to fetch latex source file"
     # Explicitly give the output file name because old-style arxiv
     # id's result in files like 9901012 that lack the archive name.
+
     if user_agent is None:        
         print >> sys.stderr, "User agent string not set.  Arxiv.org blocks requests with the user"
         print >> sys.stderr, "agent string wget.  You must set a different one like this:"
@@ -137,12 +169,6 @@ def untar_command(fn):
 def gunzip_command(fn):
     "Give the command to decompress a gzip file."    
     return ["gunzip",  fn]
-
-#def gunzip(aid):
-#    #old_fn = aid
-#    #new_fn = aid + '.gz'
-#    #shutil.move(old_fn, new_fn)
-#    subprocess.call(gunzip_command(aid))
 
 def file_name_base(aid):
     "Name of latex/source file for an arxiv id without the extension"

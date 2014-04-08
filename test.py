@@ -1,14 +1,7 @@
-import unittest, re, tempfile, os
-
-import arxiv_id, scrape, util, update, fetch, overheard
-
-network_tests = True
-
-# Actually want two of these, one old, one new.
-test_aids = ['1401.0059', 'astro-ph/9909321']
-test_delay = 5
-test_file = "overheard.py"
-
+#########
+# Notes #
+#########
+# 
 # Run all tests from command line
 #   python test.py
 #   python -m test
@@ -135,7 +128,7 @@ class FetchTest(unittest.TestCase):
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_source_and_latex(self):
-        # the exercises fetch.latex, fetch.all_source, fetch.latex, and
+        # the exercises fetch.source, fetch.all_source, fetch.latex, and
         # fetch.all_latex
         fetch.all_source(test_aids, delay=test_delay, force=True)
         fetch.all_latex(test_aids)

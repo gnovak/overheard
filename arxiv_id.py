@@ -1,6 +1,6 @@
 import re
 
-# Would be nice to just or together the two regexps.  However, that
+# Would be nice to just 'or' together the two regexps.  However, that
 # messes up the group numbers use to pick apart the ids.  Named groups
 # seem made to solve this problem, but the re module complains when
 # you give two groups the same name, even if they're on exclusive
@@ -14,7 +14,10 @@ old_regexp = '^([-a-z]+)/([0-9]{4})([0-9]{3})(v[0-9]+)?$'
 # yymm.NNNN
 new_regexp = '^()([0-9]{4}).([0-9]{4})(v[0-9]+)?$'
 
-# Match fields for both are are section name, yymm, number, version
+# Match fields for both are are archive name, yymm, number, version
+# 
+# For new-style identifiers, the regexp is set up to give the empty
+# string for the archive name
 
 def is_old(aid):
     "Is this an old-style arxiv id?"    

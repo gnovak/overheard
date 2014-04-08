@@ -1,75 +1,60 @@
+#!/opt/local/bin/python
 ################
 # Ideas, Todos #
 ################
 # 
-# Code Cleanup
-# - remove temp dir
-# - add docstrings
-#
 # Small Improvements
-# - classify something as latex if it has latex or LaTeX in it. (LaTeX auxiliary file)
-# - Move user agent string to config file.
+# - Start downloading all papers, not just astro-ph
+# - Some people put dirs in their tar files, could use walk_tree
+#   instead of listdir
+# - Actually second run took 8.5 min, so... acceptable overheard.
+# - Some people don't put linebreaks -- short comments > 80 chars are
+#   really long comments.  Should maybe clean linebreaks, %'s out of
+#   long comments anyway.
 # - Move paths to latex and data dirs to config file
 # - Detect if I'm getting stonewalled by arxiv.org
 # - Allow partial line /full line to be "long comment"?
-# - Need a function that takes a directory + returns a list of arxiv
-#   ids to support mass latex extraction
 # - Package up into "official" python package
 # - Keep record of which comments came from which papers?
-# - Start downloading all papers, not just astro-ph
+# - Handle both .gz and .pdf papers existing -- 1401.0908 was PDF-only
+#   (so there was a PDF in the source dir) but then withdrawn, which
+#   generated a .gz file containing the text file 'withdrawn.'  This
+#   caused the code to barf, but I _think_ that's the only case that
+#   can lead to this.  So just handle it, maybe w/ a warning.
+# - Check for files with pdf extension 
 #
-# Handle versions
-# - ???
+# Large improvements
+# - Handle multiple versions of each paper
+#   + Fetch all versions of papers
+#   + Turn off caching when downloading new papers so we get replacements
+#   + Explicitly put in version ids to avoid overwriting
+# - Handle character encoding
+# - More efficient tweet finding
+#   + Would like blacklist and whitelist -- kill 'boilerplate' comments,
+#     definitely keep anything with 'fuck' in it.
+#   + Some kind of filtering... blacklist/whitelist.  Always keep
+#     comments infolving profanity, but always take out boilerplate from
+#     sample files.
+#   + Automated filtering?
+#   + Collaborative filtering?
+#   + Want some kind of clustering: unusual comments: use words that
+#     typically don't appear in sci papers.  Could look for non-comment
+#     lines and then look for comment lines.
 #
-# Ideas:
-# - add force option to fetch.fetch_latex
-# - fix fetch.fetch_latex and fetch.get_latex names
-# - make predicates is_blah
-# - Make web site that allows you to feed archive ids and get comments
-# - Astro-ph diff: using latexdiff?  Or just diff of tex file?
-# - Take papers from RSS feed
-# - Take papers from ADS search
-# - Take papers from arxiv search
-# - Some kind of filtering... take out boilerplate, for instance
-# - Look into automated interface
-# - Detect if I'm getting stonewalled by arxiv.org
-# - Put delays into file fetching...
-# - upload to github
-# - Keep record of tweets, look for comments similar to them.
-# - clean code a little
+# Other todos
 # - Post to github
-# - Snarf input from arxiv mailing
-# - Allow partial line /full line to be "long comment"?
-# - remove temp dir
-
-# - Want some kind of clustering: unusual comments: use words that
-#   typically don't appear in sci papers.  Could look for non-comment
-#   lines and then look for comment lines.
-# - Would like blacklist and whitelist -- kill 'boilerplate' comments,
-#   definitely keep anything with 'fuck' in it.
-
-# Notes:
 #
-# archive.org Won't accept wget user agent string, can be anything else
+# Other ideas
+# - Make web site that allows you to feed archive ids and get comments?
+# - Take papers from ADS search, arxiv search?
+#
+#########
+# Notes #
+#########
 # 
-# Fetching tar files (same for old and new archive identifiers)
-#  0408420 gives most recent
-#  0408420vN gives version N
-#  0408420vN if N > number of versions gives most recent version
-
-# Command to download arxiv sources
-# s3cmd sync --add-header="x-amz-request-payer: requester" s3://arxiv/src/ .
-
-# Split into:
-# map arxiv id to path
-# extract latex
-# extract comments
-# util
-# dealing with arxiv ids
-# dealing with filenames
-# Shell commands...?
-# RSS feed/downloading new papers
-# main
+# - Shell command dependencies:
+#   wget, tar, file, cat, gzip
+#
 
 import os, datetime
 
