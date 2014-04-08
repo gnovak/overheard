@@ -5,8 +5,9 @@ import arxiv_id, scrape, util, update, fetch, overheard
 network_tests = True
 
 # Actually want two of these, one old, one new.
-test_aids = ['1401.0059', '9909321']
+test_aids = ['1401.0059', 'astro-ph/9909321']
 test_delay = 5
+test_file = "overheard.py"
 
 # Run all tests from command line
 #   python test.py
@@ -69,6 +70,11 @@ class FetchTest(unittest.TestCase):
     def test_extension(self):
         fetch.extension('filename.txt')
 
+    def test_ensure_dir_exists(self):
+        #the_dir = os.path.join(tempfile.mkdtemp(), 'aaa', 'bbb', 'file.txt')
+        the_dir = os.path.join(tempfile.mkdtemp(), 'aaa')
+        fetch.ensure_dir_exists(the_dir)
+
     def test_arxiv_to_url(self):
         for aid in test_aids:
             fetch.arxiv_to_url(aid)
@@ -78,12 +84,10 @@ class FetchTest(unittest.TestCase):
             fetch.fetch_command(aid)
 
     def test_decompress_command(self):
-        for aid in test_aids:
-            fetch.decompress_command(aid)
-
+        fetch.decompress_command("fake.tar")
+            
     def test_gunzip_command(self):
-        for aid in test_aids:
-            fetch.gunzip_command(aid)
+        fetch.gunzip_command("fake.gz")
 
     # FIXME -- this is set to run in particular dir
     # def test_gunzip(self):
@@ -94,45 +98,35 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.latex_file_name(aid)
 
+    def test_file_name_base(self):
+        for aid in test_aids:
+            fetch.file_name_base(aid)
+
     def test_tar_file_name(self):
         for aid in test_aids:
             fetch.tar_file_name(aid)
 
-    def test_file_type_string(self):
+    def test_tar_file_name_base(self):
         for aid in test_aids:
-            fetch.file_type_string(aid)
+            fetch.tar_file_name_base(aid)
+
+    def test_file_type_string(self):        
+        fetch.file_type_string(test_file)
 
     def test_is_uncompressed_tar_file(self):
-        for aid in test_aids:
-            fetch.is_uncompressed_tar_file(aid)
+        fetch.is_uncompressed_tar_file(test_file)
 
-    def test_is_gzipped_tar_file(self):
-        for aid in test_aids:
-            fetch.is_gzipped_tar_file(aid)
+    def test_is_gzip_file(self):
+        fetch.is_gzip_file(test_file)
 
-    def test_is_gzipped_tex_file(self):
-        for aid in test_aids:
-            fetch.is_gzipped_tex_file(aid)
+    def test_is_pdf_file(self):
+        fetch.is_pdf_file(test_file)
 
-    def test_is_pdf(self):
-        for aid in test_aids:
-            fetch.is_pdf(aid)
+    def test_is_tex_file(self):
+        fetch.is_tex_file(test_file)
 
-    def test_is_valid_latex(self):
-        for aid in test_aids:
-            fetch.is_valid_latex(aid)
-
-    def is_valid_latex(self):
-        for aid in test_aids:
-            fetch.is_valid_latex(aid)
-
-    def test_is_valid_non_latex(self):
-        for aid in test_aids:
-            fetch.is_valid_non_latex(aid)
-
-    def test_is_unknown(self):    
-        for aid in test_aids:
-            fetch.is_unknown(aid)
+    def test_is_other_file(self):
+        fetch.is_other_file(test_file)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_all_latex(self):
@@ -231,14 +225,14 @@ class ArchivTest(unittest.TestCase):
         self.assertEqual(arxiv_id.yymm('astro-ph/1234567v12'), '1234')
         self.assertEqual(arxiv_id.number('astro-ph/1234567v12'), '567')
         self.assertEqual(arxiv_id.version('astro-ph/1234567v12'), 'v12')
-        self.assertEqual(arxiv_id.version('astro-ph/1234567'), None)
+        self.assertEqual(arxiv_id.version('astro-ph/1234567'), '')
 
     def test_arxiv_new_id_parse(self):
         self.assertEqual(arxiv_id.archive('1234.5678v12'), '')
         self.assertEqual(arxiv_id.yymm('1234.5678v12'), '1234')
         self.assertEqual(arxiv_id.number('1234.5678v12'), '5678')
         self.assertEqual(arxiv_id.version('1234.5678v12'), 'v12')
-        self.assertEqual(arxiv_id.version('1234.5678'), None)
+        self.assertEqual(arxiv_id.version('1234.5678'), '')
 
     def test_arxiv_id_new(self):
         # good ids
