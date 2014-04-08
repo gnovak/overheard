@@ -112,17 +112,12 @@ def fetch_command(aid):
             ([] if verbose else ["--output-file", "/dev/null"]) + 
             [arxiv_to_url(aid)])
             
-def decompress_command(fn):
-    "Give the command to decompress a latex source file."    
+def untar_command(fn):
+    "Give the command extract a tar archive."    
     return ["tar",  "xf", fn]
 
 def gunzip_command(fn):
-    "Give the command to decompress a latex source file."    
-    # This takes place in a temporary directory: don't pass the full
-    # path, only the filename
-    # 
-    #path_name = tar_file_name(aid)
-    #path, fn = os.path.split(path_name)
+    "Give the command to decompress a gzip file."    
     return ["gunzip",  fn]
 
 #def gunzip(aid):
@@ -334,12 +329,15 @@ def get_latex(aid):
             shutil.move(base_fn, base_fn + '.tex')
         elif is_tar(base_fn):
             # if it's a tar file, extract
-            subprocess.call(decompress_command(base_fn))
+            if verbose: print "Extracting", aid            
+            subprocess.call(untar_command(base_fn))
         elif is_pdf(ext_fn):
-            # pdf files still have extension
+            # pdf files still have extension, so look at the filename
+            # with extension.
             pass
         elif is_other(base_fn):
-            # Everything except pdf files has been decompressed
+            # Everything except pdf files has been decompressed, so
+            # look at the filename without the extension.
             pass
         else:
             print "Unknown file type %s !" % aid

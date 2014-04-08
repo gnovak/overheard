@@ -79,8 +79,8 @@ class FetchTest(unittest.TestCase):
         for aid in test_aids:
             fetch.fetch_command(aid)
 
-    def test_decompress_command(self):
-        fetch.decompress_command("fake.tar")
+    def test_untar_command(self):
+        fetch.untar_command("fake.tar")
             
     def test_gunzip_command(self):
         fetch.gunzip_command("fake.gz")
