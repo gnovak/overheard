@@ -264,48 +264,52 @@ def latex(aid):
         raise ValueError, "File not found for %s!" % aid 
     path_name = source_file_path(aid)
     tmpdir = tempfile.mkdtemp()    
-    shutil.copy(path_name, tmpdir)
-    with util.remember_cwd():
-        # All of this is taking place in a temp dir, so I only want
-        # filenames, not paths.
-        os.chdir(tmpdir)
+    print tmpdir
+    try:
+        shutil.copy(path_name, tmpdir)    
+        with util.remember_cwd():
+            # All of this is taking place in a temp dir, so I only want
+            # filenames, not paths.
+            os.chdir(tmpdir)
 
-        base_fn = file_name_base(aid)
-        ext_fn = source_file_name(aid)
-        
-        # gunzip if necessary
-        if is_gzip(ext_fn):
-            if verbose: print "Decompressing", aid            
-            subprocess.call(gunzip_command(ext_fn))
-        
-        if is_tex(base_fn):
-            # if it's a tex file, rename to correct extension
-            shutil.move(base_fn, base_fn + '.tex')
-        elif is_tar(base_fn):
-            # if it's a tar file, extract
-            if verbose: print "Extracting", aid            
-            subprocess.call(untar_command(base_fn))
-        elif is_pdf(ext_fn):
-            # pdf files still have extension, so look at the filename
-            # with extension.
-            pass
-        elif is_other(base_fn):
-            # Everything except pdf files has been decompressed, so
-            # look at the filename without the extension.
-            pass
-        else:
-            print "Unknown file type %s !" % aid
+            base_fn = file_name_base(aid)
+            ext_fn = source_file_name(aid)
 
-        # All Latex files should now have .tex extensions, collect them.
-        files = os.listdir('.')
-        latex_files = [fn for fn in files if extension(fn) == 'tex']
-        
-        # If there are no latex files, an empty file should be
-        # generated to avoid later file not found errors.        
-        latex_fn = latex_file_path(aid)
-        ensure_dirs_exist(latex_fn)
-        with open(latex_fn, 'w') as outf:
-            if latex_files:
-                # Can have multiple tex files, just concat them
-                subprocess.call(['cat'] + latex_files, stdout=outf)
+            # gunzip if necessary
+            if is_gzip(ext_fn):
+                if verbose: print "Decompressing", aid            
+                subprocess.call(gunzip_command(ext_fn))
 
+            if is_tex(base_fn):
+                # if it's a tex file, rename to correct extension
+                shutil.move(base_fn, base_fn + '.tex')
+            elif is_tar(base_fn):
+                # if it's a tar file, extract
+                if verbose: print "Extracting", aid            
+                subprocess.call(untar_command(base_fn))
+            elif is_pdf(ext_fn):
+                # pdf files still have extension, so look at the filename
+                # with extension.
+                pass
+            elif is_other(base_fn):
+                # Everything except pdf files has been decompressed, so
+                # look at the filename without the extension.
+                pass
+            else:
+                print "Unknown file type %s !" % aid
+
+            # All Latex files should now have .tex extensions, collect them.
+            files = os.listdir('.')
+            latex_files = [fn for fn in files if extension(fn) == 'tex']
+
+            # If there are no latex files, an empty file should be
+            # generated to avoid later file not found errors.        
+            latex_fn = latex_file_path(aid)
+            ensure_dirs_exist(latex_fn)
+            with open(latex_fn, 'w') as outf:
+                if latex_files:
+                    # Can have multiple tex files, just concat them
+                    subprocess.call(['cat'] + latex_files, stdout=outf)
+    finally:
+        shutil.rmtree(tmpdir)
+                    
