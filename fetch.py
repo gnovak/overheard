@@ -152,12 +152,14 @@ def fetch_latex(aid):
             subprocess.call(fetch_command(aid))
 
             # rename file to have correct extension
-            if is_pdf(aid):
+            if is_pdf_file(tar_file_name_base(aid)):
                 shutil.move(tar_base, tar_base + '.pdf')
-            elif is_gzipped_tar_file(aid) or is_gzipped_tex_file(aid):
+            elif is_gzip_file(tar_file_name_base(aid)):
                 shutil.move(tar_base, tar_base + '.gz')                
-            elif is_uncompressed_tar_file(aid):
-                shutil.move(tar_base, tar_base + '.tar')
+            # bare tar files don't appear in "official" archive, don't
+            # create them here.
+            #elif is_uncompressed_tar_file(tar_file_name_base(aid)):
+            #    shutil.move(tar_base, tar_base + '.tar')
             else:
                 # This should/would be an exception, but it occurs
                 # when downloading the new astro-ph files for the day.
