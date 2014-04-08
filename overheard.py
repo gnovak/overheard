@@ -1,10 +1,13 @@
-# Convert to "official" dir tree 
-# - files have extensions... put them on when downloading?
-# - old-style ones prefix the archive
-# - new-style ones do not prefix the arxiv
-# - eventually expand concept of aid to include archive name
-# - add 3 types: tar, gzip pdf, gzip tex for each of old/new aids to tests
-# - make wget redirect to /dev/null via --output-file
+################
+# Ideas, Todos #
+################
+# 
+# Code Cleanup
+# - remove temp dir
+# - add docstrings
+#
+# Small Improvements
+# - classify something as latex if it has latex or LaTeX in it. (LaTeX auxiliary file)
 # - Move user agent string to config file.
 # - Move paths to latex and data dirs to config file
 # - Detect if I'm getting stonewalled by arxiv.org
@@ -101,12 +104,6 @@ def download_todays_papers(delay=60, nmax=None):
 def main(delay=60, prefix='.', nmax=None):
     # nmax is for testing to specify that a small number of papers
     # should be fetched.
-
-    for the_dir in [path.tar, path.latex]:        
-        if not os.path.exists(the_dir):
-            os.mkdir(the_dir)
-        elif not os.path.isdir(the_dir):
-            raise RuntimeError, the_dir + "is not a directory!"
 
     date_str = datetime.date.today().isoformat()
     long_fn = os.path.join(prefix, date_str + '-long.tex')
