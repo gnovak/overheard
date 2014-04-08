@@ -111,20 +111,20 @@ def file_type_string(fn):
     stdout, stderr = pipe.communicate()
     return stdout
 
-def is_uncompressed_tar_file(fn):
+def is_tar(fn):
     return re.search('tar archive', file_type_string(fn))
 
-def is_gzip_file(fn):
+def is_gzip(fn):
     return re.search('gzip compressed data', file_type_string(fn))
 
-def is_pdf_file(fn):
+def is_pdf(fn):
     return re.search('PDF document', file_type_string(fn))
 
-def is_tex_file(fn):
+def is_tex(fn):
     # Accept anything with the word 'text' in it.
     return re.search('text', file_type_string(fn))
 
-def is_other_file(aid):
+def is_other(aid):
     # File types that are known, but that we can't do anything with
     # This is so if a file type is totally unknown, we can print a
     # message and catch it.
@@ -151,9 +151,9 @@ def fetch_latex(aid):
             subprocess.call(fetch_command(aid))
 
             # rename file to have correct extension
-            if is_pdf_file(tar_file_name_base(aid)):
+            if is_pdf(tar_file_name_base(aid)):
                 shutil.move(tar_base, tar_base + '.pdf')
-            elif is_gzip_file(tar_file_name_base(aid)):
+            elif is_gzip(tar_file_name_base(aid)):
                 shutil.move(tar_base, tar_base + '.gz')                
             # bare tar files don't appear in "official" archive, don't
             # create them here.
@@ -241,20 +241,20 @@ def get_latex(aid):
 
         os.chdir(tmpdir)
         # gunzip if necessary
-        if is_gzip_file(ext_fn):
+        if is_gzip(ext_fn):
             if verbose: print "Decompressing", aid            
             subprocess.call(gunzip_command(ext_fn))
         
-        if is_tex_file(base_fn):
+        if is_tex(base_fn):
             # if it's a tex file, rename to correct extension
             shutil.move(base_fn, base_fn + '.tex')
-        elif is_uncompressed_tar_file(base_fn):
+        elif is_tar(base_fn):
             # if it's a tar file, extract
             subprocess.call(decompress_command(base_fn))
-        elif is_pdf_file(ext_fn):
+        elif is_pdf(ext_fn):
             # pdf files still have extension
             pass
-        elif is_other_file(base_fn):
+        elif is_other(base_fn):
             # Everything except pdf files has been decompressed
             pass
         else:

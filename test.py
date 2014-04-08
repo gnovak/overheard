@@ -104,20 +104,20 @@ class FetchTest(unittest.TestCase):
     def test_file_type_string(self):        
         fetch.file_type_string(test_file)
 
-    def test_is_uncompressed_tar_file(self):
-        fetch.is_uncompressed_tar_file(test_file)
+    def test_is_tar(self):
+        fetch.is_tar(test_file)
 
-    def test_is_gzip_file(self):
-        fetch.is_gzip_file(test_file)
+    def test_is_gzip(self):
+        fetch.is_gzip(test_file)
 
-    def test_is_pdf_file(self):
-        fetch.is_pdf_file(test_file)
+    def test_is_pdf(self):
+        fetch.is_pdf(test_file)
 
-    def test_is_tex_file(self):
-        fetch.is_tex_file(test_file)
+    def test_is_tex(self):
+        fetch.is_tex(test_file)
 
-    def test_is_other_file(self):
-        fetch.is_other_file(test_file)
+    def test_is_other(self):
+        fetch.is_other(test_file)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_fetch_all_latex(self):
