@@ -36,13 +36,16 @@ def fetch_command(aid):
             "--output-document", tar_file_name_base(aid), 
             arxiv_to_url(aid)]
 
-def decompress_command(aid):
+def decompress_command(fn):
     "Give the command to decompress a latex source file."    
-    return ["tar",  "xf", tar_file_name(aid)]
+    return ["tar",  "xf", fn]
 
-def gunzip_command(aid):
+def gunzip_command(fn):
     "Give the command to decompress a latex source file."    
-    pass
+    # This takes place in a temporary directory: don't pass the full path, only the filename
+    #path_name = tar_file_name(aid)
+    #path, fn = os.path.split(path_name)
+    return ["gunzip",  fn]
 
 def gunzip(aid):
     old_fn = aid
@@ -91,20 +94,10 @@ def tar_file_name(aid, with_extension=True):
         return False
     return paths[exist.index(True)]
 
-def file_type_string(aid):
+def file_type_string(fn):
     "Find out what kind of file it is."
-    # This might be called to find out how to handle a just-downloaded
-    # file, in which case the data is sitting in
-    # tar_file_name_base(aid).  It might also be called to figure out
-    # how to decompress a previously downloaded file in order to
-    # extract the latex.  In that case, the data is sitting in
-    # tar_file_name(aid)
-    whole_fn = tar_file_name(aid)
-    base_fn = tar_file_name_base(aid)
 
-    if os.path.isfile(whole_fn) and os.path.isfile(base_fn):
-        raise RuntimeError, "More than one file for %s!" % aid
-    pipe = subprocess.Popen(["file", whole_fn or base_fn], stdout=subprocess.PIPE)
+    pipe = subprocess.Popen(["file", fn], stdout=subprocess.PIPE)
     stdout, stderr = pipe.communicate()
     return stdout
 
