@@ -54,10 +54,6 @@ class OverheardTest(unittest.TestCase):
         overheard.main(delay=test_delay, prefix=tempfile.gettempdir(), nmax=2)
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_download_todays_papers(self):
-        overheard.download_todays_papers(delay=test_delay, nmax=2)
-
-    @unittest.skipIf(not network_tests, "Skipping network tests.")
     def do_it_all(self):
         tf_1 = tempfile.NamedTemporaryFile()
         tf_2 = tempfile.NamedTemporaryFile()
