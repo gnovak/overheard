@@ -47,11 +47,11 @@ def gunzip_command(fn):
     #path, fn = os.path.split(path_name)
     return ["gunzip",  fn]
 
-def gunzip(aid):
-    old_fn = aid
-    new_fn = aid + '.tex.gz'
-    shutil.copy(old_fn, new_fn)
-    subprocess.call(["gunzip",  new_fn])
+#def gunzip(aid):
+#    #old_fn = aid
+#    #new_fn = aid + '.gz'
+#    #shutil.move(old_fn, new_fn)
+#    subprocess.call(gunzip_command(aid))
 
 def file_name_base(aid):
     "Filename of latex/tar file for archive paper without the extension"
