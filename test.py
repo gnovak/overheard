@@ -67,10 +67,9 @@ class FetchTest(unittest.TestCase):
     def test_extension(self):
         fetch.extension('filename.txt')
 
-    def test_ensure_dir_exists(self):
-        #the_dir = os.path.join(tempfile.mkdtemp(), 'aaa', 'bbb', 'file.txt')
-        the_dir = os.path.join(tempfile.mkdtemp(), 'aaa')
-        fetch.ensure_dir_exists(the_dir)
+    def test_ensure_dirs_exist(self):
+        the_dir = os.path.join(tempfile.mkdtemp(), 'aa', 'bb', 'file.txt')
+        fetch.ensure_dirs_exist(the_dir)
 
     def test_arxiv_to_url(self):
         for aid in test_aids:

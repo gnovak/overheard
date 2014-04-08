@@ -16,14 +16,21 @@ def extension(fn):
 
 # Maybe make this take a full path with filename and create all
 # leading dirs to avoid having to split it apart
-def ensure_dir_exists(the_dir):
-    """Make sure that the_dir exists and is a directory."""
-    # This only creates the last component of the path.  If more than
-    # one component is missing, there will be an error.
-    if not os.path.exists(the_dir):
-        os.mkdir(the_dir)
-    elif not os.path.isdir(the_dir):
-        raise RuntimeError, the_dir + "is not a directory!"
+def ensure_dirs_exist(path_name):
+    """Ensure that dirs exist to create a file
+    
+    path_name is expected to be the path to a file, including the
+    filename.  This creates all of the directories leading up to the
+    filename.  
+
+    If path_name ends with a path separator, then the last element is
+    known to be a directory and the entire path is created if it
+    doesn't exist.
+
+    """
+    
+    dir, fn = os.path.split(path_name)
+    os.makedirs(dir)
     
 def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
@@ -138,7 +145,7 @@ def fetch_latex(aid):
         with util.remember_cwd():            
             tar_base = tar_file_name_base(aid)
             dir, fn = os.path.split(tar_base)
-            ensure_dir_exists(dir)
+            ensure_dirs_exist(tar_base)
             os.chdir(dir)
             subprocess.call(fetch_command(aid))
 
@@ -259,8 +266,7 @@ def get_latex(aid):
         # If there are no latex files, an empty file should be
         # generated to avoid later file not found errors.        
         latex_fn = latex_file_name(aid)
-        dir, fn = os.path.split(latex_fn)
-        ensure_dir_exists(dir)
+        ensure_dirs_exist(latex_fn)
         with open(latex_fn, 'w') as outf:
             if latex_files:
                 # Can have multiple tex files, just concat them
