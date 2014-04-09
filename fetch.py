@@ -65,9 +65,18 @@
 #  0408420vN if N > number of versions gives most recent version
 #
 
-import os, subprocess, tempfile, shutil, re, time
+import sys, os, subprocess, tempfile, shutil, re, time
 
 import path, util, arxiv_id
+
+# Interactive use/testing more or less requires that fetch.user_agent
+# be set to something here in the source file.  However, I don't want
+# other people hammering arxiv.org with a user agent string that looks
+# like it's me.  Therefore the arg parsing code in overheard.py sets
+# fetch.user_agent to None if the value isn't provided on the command
+# line.  That triggers an error message if wget is called.
+
+user_agent = 'overheard'
 
 verbose = True
 
@@ -106,8 +115,17 @@ def arxiv_to_url(aid):
 
 def fetch_command(aid):    
     "Give the command to fetch latex source file"
-    # Direct this to file I want to avoid fussing around with incoming_tar_file_name()
-    return (["wget",  "-U 'overheard'", 
+    # Explicitly give the output file name because old-style arxiv
+    # id's result in files like 9901012 that lack the archive name.
+    if user_agent is None:        
+        print >> sys.stderr, "User agent string not set.  Arxiv.org blocks requests with the user"
+        print >> sys.stderr, "agent string wget.  You must set a different one like this:"
+        print >> sys.stderr
+        print >> sys.stderr, "%s -u 'my user agent string'" % sys.argv[0]
+        print >> sys.stderr
+        sys.exit(1)
+
+    return (["wget",  "-U '%s'" % user_agent, 
              "--output-document", source_file_path_without_extension(aid)] + 
             ([] if verbose else ["--output-file", "/dev/null"]) + 
             [arxiv_to_url(aid)])
@@ -264,7 +282,6 @@ def latex(aid):
         raise ValueError, "File not found for %s!" % aid 
     path_name = source_file_path(aid)
     tmpdir = tempfile.mkdtemp()    
-    print tmpdir
     try:
         shutil.copy(path_name, tmpdir)    
         with util.remember_cwd():
