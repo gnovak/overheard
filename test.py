@@ -75,7 +75,7 @@ class FetchTest(unittest.TestCase):
 
     def test_fetch_command(self):
         for aid in test_aids:
-            fetch.fetch_command(aid)
+            fetch.fetch_command(aid, "filename")
 
     def test_untar_command(self):
         fetch.untar_command("fake.tar")

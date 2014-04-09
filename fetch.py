@@ -113,7 +113,7 @@ def arxiv_to_url(aid):
     "Change an archiv identifier to a URL"
     return "http://arxiv.org/e-print/" + aid
 
-def fetch_command(aid):    
+def fetch_command(aid, fn):    
     "Give the command to fetch latex source file"
     # Explicitly give the output file name because old-style arxiv
     # id's result in files like 9901012 that lack the archive name.
@@ -126,7 +126,7 @@ def fetch_command(aid):
         sys.exit(1)
 
     return (["wget",  "-U '%s'" % user_agent, 
-             "--output-document", source_file_path_without_extension(aid)] + 
+             "--output-document", fn] + 
             ([] if verbose else ["--output-file", "/dev/null"]) + 
             [arxiv_to_url(aid)])
             
@@ -246,19 +246,21 @@ def source(aid, force=False):
         if verbose: print "Using cached copy of source file"
         return False
     else:
+        # Interrupted downloads leave partial files laying around.
+        # Download to temp directory, then rename to final filename to
+        # avoid polluting the archive.
+        tf = tempfile.NamedTemporaryFile()
+        subprocess.call(fetch_command(aid, tf.name))
+
         source_base = source_file_path_without_extension(aid)
         ensure_dirs_exist(source_base)
-        subprocess.call(fetch_command(aid))
-
-        # rename file to have correct extension
-        if is_pdf(source_base):
-            shutil.move(source_base, source_base + '.pdf')
-        elif is_gzip(source_base):
-            shutil.move(source_base, source_base + '.gz')                
-        # bare tar files don't appear in "official" archive, don't
-        # create them here.
-        #elif is_uncompressed_tar_file(tar_file_name_base(aid)):
-        #    shutil.move(tar_base, tar_base + '.tar')
+        # copy file to have correct extension.  User copy rather than
+        # move so the system can happily delete the temp file when
+        # it's closed.
+        if is_pdf(tf.name):
+            shutil.copy(tf.name, source_base + '.pdf')
+        elif is_gzip(tf.name):
+            shutil.copy(tf.name, source_base + '.gz')
         else:
             # This should/would be an exception, but it occurs
             # when downloading the new astro-ph files for the day.
