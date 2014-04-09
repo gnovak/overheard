@@ -43,8 +43,9 @@ class OverheardTest(unittest.TestCase):
         fetch.verbose = self.fetch_verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
-    def test_main(self):
-        overheard.main(delay=test_delay, prefix=tempfile.gettempdir(), nmax=2)
+    def test_process_todays_papers(self):
+        overheard.process_todays_papers(delay=test_delay, 
+                                        prefix=tempfile.gettempdir(), nmax=2)
 
 
 class FetchTest(unittest.TestCase):

@@ -56,11 +56,11 @@
 #   wget, tar, file, cat, gzip
 #
 
-import os, datetime
+import sys, os, datetime, argparse
 
 import path, update, fetch, scrape
 
-def main(delay=60, prefix='.', nmax=None):
+def process_todays_papers(delay=60, prefix='.', nmax=None):
     "Download today's papers and extract comments"
     # nmax is for testing to specify that a small number of papers
     # should be fetched.
@@ -73,8 +73,24 @@ def main(delay=60, prefix='.', nmax=None):
     if not nmax is None: aids = aids[:min(len(aids), nmax)]
     fetch.all_source(aids, delay=delay)
     fetch.all_latex(aids)    
-    scrape.write_output(aids, long_outfn, short_outfn)
+    scrape.write_output(aids, long_fn, short_fn)
 
+def main(argv=None):
+    if argv is None: argv = sys.argv
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Suppress progress messages', )
+    parser.add_argument('-d', '--delay', type=int, default=10, 
+                        help="Delay in sec between requests to arxiv.org", )
+    parser.add_argument('-u', '--user-agent', 
+                        help="User agent string to use for requests to arxiv.org")
+
+    args = parser.parse_args(argv[1:])
+    fetch.user_agent = args.user_agent
+    fetch.verbose = update.verbose = not args.quiet
+
+    process_todays_papers(delay=args.delay)
 
 if type(__builtins__) is type({}):
     names = __builtins__.keys()
@@ -82,4 +98,4 @@ else:
     names = dir(__builtins__)
 
 if __name__ == '__main__' and '__IPYTHON__' not in names:
-    main()
+    sys.exit(main())
