@@ -198,7 +198,7 @@ def source_file_extension(aid):
     n_exist = exist.count(True)
 
     if n_exist > 1:
-        raise RuntimeError, "More than one file exists for" % aid
+        raise RuntimeError, "More than one file exists for %s" % aid
     elif n_exist == 0:
         return False
         
