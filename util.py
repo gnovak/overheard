@@ -11,6 +11,19 @@ def remember_cwd():
 
 ### Code snippet from gsn_util package
 ### https://pypi.python.org/pypi/gsn_util/
+
+def flatten(L):
+    """Return a flat list with the same elements as arbitrarily nested
+    list L"""
+    def rec(lst):
+        for el in lst:
+            if type(el) is not type([]):
+                result.append(el)
+            else:
+                rec(el)
+    result = []
+    rec(L)
+    return result
 #
 # These were used for caching the rss feed, but they're not currently used anywhere.
 # 
