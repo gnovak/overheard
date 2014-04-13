@@ -315,8 +315,8 @@ def latex(aid):
                 # look at the filename without the extension.
                 pass
             else:
-                print "Unknown file type %s !" % aid
-
+                # The line break comes at the end of file_type_string()
+                print "Unknown file type: ", file_type_string(base_fn), 
             # All Latex files should now have .tex extensions, collect them.
             files = os.listdir('.')
             latex_files = [fn for fn in files if extension(fn) == 'tex']
