@@ -13,7 +13,7 @@
 
 import os, re
 
-import fetch
+import fetch, util
 
 # long comment is 'optional whitepace % comment'
 long_comment_regexp = "^\s*(%.*)$"
@@ -32,6 +32,10 @@ def long_comments(aid):
 
     with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
+    return long_comments_from_lines(lines)
+
+def long_comments_from_lines(lines):
+    "Get long comments out of latex file"
 
     # State variable
     comment_started = False 
@@ -67,6 +71,9 @@ def short_comments(aid):
     with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
+def short_comments_from_lines(lines):
+    "Get short comments out of latex file"
+
     result = []
     for line in lines:
         if not re.search(long_comment_regexp, line):
@@ -75,20 +82,38 @@ def short_comments(aid):
                 result.append(match.group(1))
     return result
 
-def write_output(aids, long_outfn, short_outfn):
+def write_output(aids, long_fn, short_fn, pickle_fn=None):
     "Scrape long and short comments, write to output files."
-    with open(long_outfn, 'w') as outf:
-        for aid in aids:
-            comments = long_comments(aid)
-            for comment in comments:
-                outf.writelines(comment)
-                outf.write('\n')
+    # If pickle_fn is given, collect everything into one dict and
+    # write to a pickled python obj.  Protect this code with if's b/c
+    # it can easly create a giant object that fills memory, so we
+    # don't want to create this object unless it's necessary.
 
-    with open(short_outfn, 'w') as outf:
-        for aid in aids:
-            comments = short_comments(aid)
-            for comment in comments:
-                outf.write(comment)
-                outf.write('\n')
-    
+    if pickle_fn:
+        s_result = {}
+        l_result = {}
 
+    with open(long_fn, 'w') as l_outf, open(short_fn, 'w') as s_outf:    
+        for aid in aids:
+            print "Scraping comments from ", aid
+
+            with open(fetch.latex_file_path(aid)) as ff:
+                lines = ff.readlines()
+            
+            l_comments = long_comments_from_lines(lines)
+            s_comments = short_comments_from_lines(lines)
+
+            for comment in l_comments:
+                l_outf.writelines(comment)
+                l_outf.write('\n')
+
+            for comment in s_comments:
+                s_outf.write(comment)
+                s_outf.write('\n')
+
+            if pickle_fn:
+                l_result[aid] = l_comments
+                s_result[aid] = s_comments
+
+    if pickle_fn:
+        util.can((l_result,s_result), pickle_fn)
