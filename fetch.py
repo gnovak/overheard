@@ -379,3 +379,50 @@ def latex(aid):
     finally:
         shutil.rmtree(tmpdir)
                     
+##################################################
+def dir_to_arxiv_ids(dir):
+    """Take a dir, list all the files, and convert them into arxiv ids.  
+
+    This is a bit of a hack, to facilitate bulk extraction of latex files, 
+    don't be too careful about it..."""
+
+    # Allowing tex, pdf, or gz extension means this can be used on
+    # latex dir or source dir
+    new_reverse_regexp = '^([0-9]{4}.[0-9]{4}(v[0-9]+)?)\.(pdf|gz|tex)$'
+    old_reverse_regexp = '^([-a-z]+)([0-9]{7}(v[0-9]+)?)\.(pdf|gz|tex)$'
+
+    files = os.listdir(dir)
+    result = []
+    for fn in files:
+        match = re.search(new_reverse_regexp, fn)
+        if match: 
+            result.append(match.group(1))
+        match = re.search(old_reverse_regexp, fn)
+        if match:
+            result.append(match.group(1) + '/' + match.group(2))
+    return result
+
+def year_to_arxiv_id(year, prefix=path.latex):
+    """Get all the arxiv ids for a given year.
+
+    year is a two char string referring to the year, 99, 07, 13
+
+    prefix is either path.source or path.latex depending on which
+    directory you want to use to generate the arxiv ids.  
+   
+    """
+    dirs = [fn for fn in os.listdir(prefix) 
+            if fn.startswith(year)]
+    ids = [dir_to_arxiv_ids(os.path.join(prefix,dir))
+           for dir in dirs]
+    return util.flatten(ids)
+
+def arxiv_ids_by_year(prefix=path.latex):
+    """Gather all arxiv ids into a dict with keys for each year"""
+    # NOTE -- depend on four-number dir prefixes here
+    fns = [fn for fn in os.listdir(prefix) 
+           if re.match('[0-9]{4}', fn)]
+    years = sorted(set(fn[0:2] for fn in fns))
+    kv_pairs = [(year, year_to_arxiv_id(year)) 
+                for year in years]
+    return dict(kv_pairs)
