@@ -1,3 +1,16 @@
+#########
+# Notes #
+#########
+# 
+# When scraping comments out of tex files, separate short comments
+# (less than full line) from long comments (at least one full line)
+# because the character of what is said is typically different in a
+# few words vs. a full paragraph.
+# 
+# Comments: Backslash-percent (to get percent into the latex output)
+# shows up in the python strings as "\\%" and a regexp for just '%'
+# doesn't match them, which simplifies my life...
+
 import os, re
 
 import fetch
@@ -6,29 +19,28 @@ import fetch
 long_comment_regexp = "^\s*(%.*)$"
 
 # Short comment is "string including at least one non-whitespace char
-# and not including percent, percent, any string."  Can't find a
-# regexp that matches 'some % comment % and more' but not ' % comment
-# $ and more' which is a long comment.  Therefore define a short
-# comment to be "some string + longest string starting with percent,
-# that doesn't also match long_comment_regexp"
+# and not including percent, percent, any string."  
+# 
+# Can't find a regexp that matches 'some % comment % and more' but not
+# ' % comment $ and more' which is a long comment.  Therefore define a
+# short comment to be "some string + longest string starting with
+# percent, that doesn't also match long_comment_regexp"
 short_comment_regexp = '.*?(%.*)$'
 
 def long_comments(aid):
-    "Get long comments out of latex file"
+    "Scrape full-line and multi-line comments out of latex file"
 
-    with open(fetch.latex_file_name(aid)) as ff:
+    with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
     # State variable
-    comment_started = False
+    comment_started = False 
     # Contains current comment
     comment = []
     # Contains list of all comments -- overall output
     result = []
 
     for line in lines:
-        # Full-line comment is anything that has only whitespace and a
-        # comment character at the beginning
         line_is_comment = re.search(long_comment_regexp, line)
         if not comment_started and line_is_comment:
             # beginning of comment
@@ -47,11 +59,12 @@ def long_comments(aid):
         else:
             # This should never happen
             raise RuntimeError
+
     return result
 
 def short_comments(aid):
-    "Get short comments out of latex file"
-    with open(fetch.latex_file_name(aid)) as ff:
+    "Scrape partial-line comments out of latex file"
+    with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
     result = []
@@ -63,7 +76,7 @@ def short_comments(aid):
     return result
 
 def write_output(aids, long_outfn, short_outfn):
-
+    "Scrape long and short comments, write to output files."
     with open(long_outfn, 'w') as outf:
         for aid in aids:
             comments = long_comments(aid)
@@ -78,12 +91,4 @@ def write_output(aids, long_outfn, short_outfn):
                 outf.write(comment)
                 outf.write('\n')
     
-
-# def all_comments(aid):
-#     "Get comments out of latex file"
-#     with open(fetch.latex_file_name(aid)) as ff:
-#         lines = ff.readlines()
-#     the_short_comments = short_comments(lines)
-#     the_long_comments = long_comments(lines)        
-#     return the_short_comments, the_long_comments
 
