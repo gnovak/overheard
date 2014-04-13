@@ -3,6 +3,7 @@ import os, cPickle, contextlib
 ### Code snippet from http://stackoverflow.com/questions/169070/
 @contextlib.contextmanager
 def remember_cwd():
+    """Restore the present current working directory when finished."""
     curdir= os.getcwd()
     try: yield
     finally: os.chdir(curdir)

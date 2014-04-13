@@ -25,21 +25,25 @@ def is_new(aid):
     return re.search(new_regexp, aid)
 
 def archive(aid):
+    "Extract the archive name from the arxiv id"
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
     if not match: raise ValueError, 'Invalid arxiv id: %s' % aid
     return match.group(1)
 
 def yymm(aid):
+    "Extract the year and month from the arxiv id"
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
     if not match: raise ValueError, 'Invalid arxiv id: %s' % aid
     return match.group(2)
 
 def number(aid):
+    "Extract the serial number from the arxiv id"
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
     if not match: raise ValueError, 'Invalid arxiv id: %s' % aid
     return match.group(3)
 
 def version(aid):
+    "Extract the paper version from the arxiv id"
     match = (re.search(new_regexp, aid) or re.search(old_regexp, aid))
     if not match: raise ValueError, 'Invalid arxiv id: %s' % aid
     # return the empty string rather than None if there's no version

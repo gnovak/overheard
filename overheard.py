@@ -76,6 +76,7 @@ import os, datetime
 import path, update, fetch, scrape
 
 def main(delay=60, prefix='.', nmax=None):
+    "Download today's papers and extract comments"
     # nmax is for testing to specify that a small number of papers
     # should be fetched.
 

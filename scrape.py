@@ -14,7 +14,7 @@ long_comment_regexp = "^\s*(%.*)$"
 short_comment_regexp = '.*?(%.*)$'
 
 def long_comments(aid):
-    "Get long comments out of latex file"
+    "Scrape full-line and multi-line comments out of latex file"
 
     with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
@@ -50,7 +50,7 @@ def long_comments(aid):
     return result
 
 def short_comments(aid):
-    "Get short comments out of latex file"
+    "Scrape partial-line comments out of latex file"
     with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
 
@@ -63,7 +63,7 @@ def short_comments(aid):
     return result
 
 def write_output(aids, long_outfn, short_outfn):
-
+    "Scrape long and short comments, write to output files."
     with open(long_outfn, 'w') as outf:
         for aid in aids:
             comments = long_comments(aid)

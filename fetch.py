@@ -110,7 +110,7 @@ def ensure_dirs_exist(path_name):
         os.makedirs(dir)
     
 def arxiv_to_url(aid):
-    "Change an archiv identifier to a URL"
+    "Get the URL to download the source file for a paper"
     return "http://arxiv.org/e-print/" + aid
 
 def fetch_command(aid, fn):    
@@ -145,7 +145,7 @@ def gunzip_command(fn):
 #    subprocess.call(gunzip_command(aid))
 
 def file_name_base(aid):
-    "Filename of latex/source file for an arxiv id without the extension"
+    "Name of latex/source file for an arxiv id without the extension"
     if arxiv_id.is_new(aid): 
         fn_base = aid
     else: 
@@ -157,27 +157,31 @@ def file_name_base(aid):
     return fn_base
 
 def latex_file_name(aid):
-    "Filename of latex source file for archive paper"
+    "Name of latex file"
     return file_name_base(aid) + '.tex'
 
 def latex_file_path(aid):
-    "Filename of latex source file for archive paper"
+    "Full path to the latex file"
     return os.path.join(path.latex, dir_prefix(aid), latex_file_name(aid))
 
 def source_file_name(aid):
-    "Filename of source file for archive paper"
+    "Name of source file"
     ext = source_file_extension(aid)
     if not ext:
         raise RuntimeError, "No files exist for %s" % aid 
     return file_name_base(aid) + ext
 
 def source_file_path(aid):
-    "Filename of source file for archive paper"
+    "Full path to source file"
     return os.path.join(path.source, dir_prefix(aid), source_file_name(aid))
 
 def source_file_path_without_extension(aid):
-    # This is used just after downloading a file, when it doesn't have
-    # the correct extension yet b/c we don't know the file type.
+    """Full path to source file without the extension
+
+    This is used when figuring out the correct extension of the source
+    file for this particular paper
+
+    """
     return os.path.join(path.source, dir_prefix(aid), file_name_base(aid))
 
 def source_file_exists(aid):
@@ -205,32 +209,42 @@ def source_file_extension(aid):
     return valid_extensions[exist.index(True)]
 
 def file_type_string(fn):
-    "Find out what kind of file it is."
+    "Return the output of the 'file' command"
 
     pipe = subprocess.Popen(["file", fn], stdout=subprocess.PIPE)
     stdout, stderr = pipe.communicate()
     return stdout
 
 def is_tar(fn):
+    "Is this a tar file?"
     return re.search('tar archive', file_type_string(fn))
 
 def is_gzip(fn):
+    "Is this a gzip file?"
     return re.search('gzip compressed data', file_type_string(fn))
 
 def is_pdf(fn):
+    "Is this a pdf file?"
     return re.search('PDF document', file_type_string(fn))
 
 def is_tex(fn):
+    "Is this a latex file?"
     # Accept anything with the word 'text' in it.
     return re.search('text', file_type_string(fn))
 
 def is_other(fn):
+    "Is this some file that we recognize but don't do anything with?"
     # File types that are known, but that we can't do anything with
     # This is so if a file type is totally unknown, we can print a
     # message and catch it.
     return re.search('TeX DVI', file_type_string(fn))
 
 def all_source(aids, delay=60, force=False):
+    """Fetch the source files for all of the given arxiv ids.
+    
+    delay is delay in seconds between fetching papers from arxiv.org
+    force=True disables caching of papers
+    """
     any_fetched = False
     for aid in aids:
         wait = source(aid, force=force)
@@ -239,7 +253,7 @@ def all_source(aids, delay=60, force=False):
             time.sleep(delay)
     return any_fetched
 
-def source(aid, force=False):
+def source(aid, force=False):    
     "Get source file from archive.org unless we already have it"
 
     if not force and source_file_exists(aid):
@@ -273,15 +287,17 @@ def source(aid, force=False):
         return True
 
 def all_latex(aids):
+    """Extract latex from all arxiv ids given."""
     for aid in aids:
         latex(aid)
 
 def latex(aid):
     "Get latex out of source file"
-    # Should clean up directory!
+
     if not source_file_exists(aid):
         # could just try to grab the file from arxiv.org here.  
         raise ValueError, "File not found for %s!" % aid 
+
     path_name = source_file_path(aid)
     tmpdir = tempfile.mkdtemp()    
     try:
