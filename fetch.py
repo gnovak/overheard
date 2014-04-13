@@ -255,8 +255,13 @@ def is_pdf(fn):
 
 def is_tex(fn):
     "Is this a latex file?"
-    # Accept anything with the word 'text' in it.
-    return re.search('text', file_type_string(fn))
+    # Accept anything with the word 'text' or LaTeX in it, but does
+    # _not_ have Postscript in it.  Postscript has %'s in it and the
+    # regexp I use for short comments apparently breaks for big files,
+    # ie, astro-ph/9505048.  That postscript file is pathological,
+    # though, it's ~50 MB of only f's.
+    return (re.search('text|LaTeX', file_type_string(fn)) and not 
+            re.search('Post[Ss]cript', file_type_string(fn)))
 
 def is_other(fn):
     "Is this some file that we recognize but don't do anything with?"
