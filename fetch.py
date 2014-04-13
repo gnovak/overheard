@@ -224,11 +224,11 @@ def is_tex(fn):
     # Accept anything with the word 'text' in it.
     return re.search('text', file_type_string(fn))
 
-def is_other(aid):
+def is_other(fn):
     # File types that are known, but that we can't do anything with
     # This is so if a file type is totally unknown, we can print a
     # message and catch it.
-    return False
+    return re.search('TeX DVI', file_type_string(fn))
 
 def all_source(aids, delay=60, force=False):
     any_fetched = False
