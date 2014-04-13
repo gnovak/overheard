@@ -37,10 +37,13 @@ class OverheardTest(unittest.TestCase):
 
     def setUp(self):
         self.fetch_verbose_setting = fetch.verbose
+        self.scrape_verbose_setting = scrape.verbose
         fetch.verbose = False
+        scrape.verbose = False
 
     def tearDown(self):
         fetch.verbose = self.fetch_verbose_setting
+        scrape.verbose = self.scrape_verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_process_todays_papers(self):
