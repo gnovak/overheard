@@ -243,7 +243,7 @@ def source(aid, force=False):
     "Get source file from archive.org unless we already have it"
 
     if not force and source_file_exists(aid):
-        if verbose: print "Using cached copy of source file"
+        if verbose: print "Using cached source file for", aid
         return False
     else:
         # Interrupted downloads leave partial files laying around.
@@ -269,7 +269,7 @@ def source(aid, force=False):
             # and move on.
             # 
             # raise RuntimeError, "Unrecognized file %s" % aid
-            print "WARNING: Unrecognized file type for %s!" % aid
+            print "WARNING: Unrecognized file type for", aid
         return True
 
 def all_latex(aids):
@@ -316,7 +316,7 @@ def latex(aid):
                 pass
             else:
                 # The line break comes at the end of file_type_string()
-                print "Unknown file type: ", file_type_string(base_fn), 
+                print "WARNING: Unknown file type: ", file_type_string(base_fn), 
             # All Latex files should now have .tex extensions, collect them.
             files = os.listdir('.')
             latex_files = [fn for fn in files if extension(fn) == 'tex']
