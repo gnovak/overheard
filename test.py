@@ -261,7 +261,9 @@ class ScrapeTest(unittest.TestCase):
         # network
 
         self.fetch_verbose_setting = fetch.verbose
+        self.scrape_verbose_setting = scrape.verbose
         fetch.verbose = False
+        scrape.verbose = False
 
         any_fetched = fetch.all_source(test_aids, delay=test_delay)
         if any_fetched: 
@@ -269,6 +271,7 @@ class ScrapeTest(unittest.TestCase):
 
     def tearDown(self):
         fetch.verbose = self.fetch_verbose_setting
+        scrape.verbose = self.scrape_verbose_setting
 
     @unittest.skipIf(not network_tests, "Skipping network tests.")
     def test_long_comments(self):

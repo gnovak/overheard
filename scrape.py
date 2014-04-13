@@ -15,6 +15,8 @@ import os, re
 
 import fetch, util
 
+verbose = True
+
 # long comment is 'optional whitepace % comment'
 long_comment_regexp = "^\s*(%.*)$"
 
@@ -95,7 +97,7 @@ def write_output(aids, long_fn, short_fn, pickle_fn=None):
 
     with open(long_fn, 'w') as l_outf, open(short_fn, 'w') as s_outf:    
         for aid in aids:
-            print "Scraping comments from ", aid
+            if verbose: print "Scraping comments from ", aid
 
             with open(fetch.latex_file_path(aid)) as ff:
                 lines = ff.readlines()

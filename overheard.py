@@ -88,7 +88,7 @@ def main(argv=None):
 
     args = parser.parse_args(argv[1:])
     fetch.user_agent = args.user_agent
-    fetch.verbose = update.verbose = not args.quiet
+    fetch.verbose = scrape.verbose = not args.quiet
 
     process_todays_papers(delay=args.delay)
 
