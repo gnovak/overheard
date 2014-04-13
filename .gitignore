@@ -1,5 +1,7 @@
 *.pyc
 data
 latex
-rss-feed.dat
 TAGS
+short-*.txt
+long-*.txt
+comments-*.dat
