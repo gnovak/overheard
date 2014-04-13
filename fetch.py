@@ -243,15 +243,15 @@ def file_type_string(fn):
 
 def is_tar(fn):
     "Is this a tar file?"
-    return re.search('tar archive', file_type_string(fn))
+    return re.search('tar archive', file_type_string(fn), re.I)
 
 def is_gzip(fn):
     "Is this a gzip file?"
-    return re.search('gzip compressed data', file_type_string(fn))
+    return re.search('gzip compressed data', file_type_string(fn), re.I)
 
 def is_pdf(fn):
     "Is this a pdf file?"
-    return re.search('PDF document', file_type_string(fn))
+    return re.search('pdf document', file_type_string(fn), re.I)
 
 def is_tex(fn):
     "Is this a latex file?"
@@ -260,15 +260,15 @@ def is_tex(fn):
     # regexp I use for short comments apparently breaks for big files,
     # ie, astro-ph/9505048.  That postscript file is pathological,
     # though, it's ~50 MB of only f's.
-    return (re.search('text|LaTeX', file_type_string(fn)) and not 
-            re.search('Post[Ss]cript', file_type_string(fn)))
+    return (re.search('text|latex', file_type_string(fn), re.I) and not 
+            re.search('postscript', file_type_string(fn), re.I))
 
 def is_other(fn):
     "Is this some file that we recognize but don't do anything with?"
     # File types that are known, but that we can't do anything with
     # This is so if a file type is totally unknown, we can print a
     # message and catch it.
-    return re.search('TeX DVI', file_type_string(fn))
+    return re.search('tex dvi', file_type_string(fn), re.I)
 
 def all_source(aids, delay=60, force=False):
     """Fetch the source files for all of the given arxiv ids.
