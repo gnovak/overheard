@@ -1,0 +1,31 @@
+=========
+overheard         
+=========
+
+Overheard is the code that runs the @OverheardOnAph twitter feed.  It
+downloads all of the new arxiv.org postings for the day and scrapes
+comments from the LaTeX source files.
+
+For more information:
+http://pypi.python.org/pypi/overheard
+
+For the source code:
+http://github.org/overheard
+
+Requirements
+============
+
+Installation
+============
+
+Usage
+=====
+
+License
+=======
+
+The code is released under the MIT license, so you should be able to
+do whatever you want with it.  
+
+If you incorporate this code into a larger project, I would appreciate
+it if you send me a note at greg.novak@gmail.com
