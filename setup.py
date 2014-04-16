@@ -11,6 +11,8 @@ args = dict(name='overheard',
             # url='http://pypi.python.org/pypi/overheard/',
             description='Overheard on Astro-ph',
             long_description=open('README').read(),
+            # Temp setting to prevent egg-ifying install, for ease of debugging
+            zip_safe = False,
             classifiers=["Development Status :: 4 - Beta",
                          "Intended Audience :: Developers",
                          "License :: OSI Approved :: MIT License",
