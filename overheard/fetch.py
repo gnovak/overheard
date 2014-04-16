@@ -98,6 +98,8 @@
 # python code.  I find this acceptable.
 # 
 
+from __future__ import with_statement
+
 import sys, os, subprocess, tempfile, shutil, re, time
 
 import path, util, arxiv_id

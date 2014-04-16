@@ -16,8 +16,17 @@
 # Run specific test interactively from REPL
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
+from __future__ import with_statement
 
 import unittest, re, tempfile, os
+
+if not hasattr(unittest, 'skipIf'):
+    try: 
+        import unittest2 as unittest        
+    except ImportError:
+        raise NotImplementedError, \
+            """Tests require either the Python 2.7 or later version of the unittest module or
+            the unittest2 module."""
 
 import arxiv_id, scrape, util, update, fetch, overheard
 

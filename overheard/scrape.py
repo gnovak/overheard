@@ -11,6 +11,8 @@
 # shows up in the python strings as "\\%" and a regexp for just '%'
 # doesn't match them, which simplifies my life...
 
+from __future__ import with_statement
+
 import os, re
 
 import fetch, util
@@ -95,13 +97,14 @@ def write_output(aids, long_fn, short_fn, pickle_fn=None):
         s_result = {}
         l_result = {}
 
-    with open(long_fn, 'w') as l_outf, open(short_fn, 'w') as s_outf:    
+    # Can run on Python 2.5, 2.6 by nesting the following with statement
+    with open(long_fn, 'w') as l_outf, open(short_fn, 'w') as s_outf:
         for aid in aids:
             if verbose: print "Scraping comments from ", aid
 
             with open(fetch.latex_file_path(aid)) as ff:
                 lines = ff.readlines()
-            
+
             l_comments = long_comments_from_lines(lines)
             s_comments = short_comments_from_lines(lines)
 
