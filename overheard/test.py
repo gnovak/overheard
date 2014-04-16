@@ -47,7 +47,11 @@ class OverheardTest(unittest.TestCase):
     def setUp(self):
         self.fetch_verbose_setting = fetch.verbose
         self.scrape_verbose_setting = scrape.verbose
-        fetch.verbose = False
+        # This is the _only_ test where I download some
+        # non-pre-screened papers, ie, they could be big.  It's useful
+        # to show the download so I don't get worried that the test
+        # has hung.
+        fetch.verbose = True
         scrape.verbose = False
 
     def tearDown(self):
