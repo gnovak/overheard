@@ -74,6 +74,7 @@ def short_comments(aid):
     "Scrape partial-line comments out of latex file"
     with open(fetch.latex_file_path(aid)) as ff:
         lines = ff.readlines()
+    return short_comments_from_lines(lines)
 
 def short_comments_from_lines(lines):
     "Get short comments out of latex file"
