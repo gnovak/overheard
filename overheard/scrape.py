@@ -32,7 +32,7 @@ long_comment_regexp = "^\s*(%.*)$"
 short_comment_regexp = '.*?(%.*)$'
 
 encodings = ['utf-8',
-             'latin-1', 
+             'latin-1',
              'GB2312',
              'Windows-1251',
              'Windows-1252',
@@ -42,7 +42,7 @@ encodings = ['utf-8',
              'ucs-2',
              'ucs-4']
 
-def readlines(fn):   
+def readlines(fn):
     """Read all lines from fn
 
     Loop over guesses at the text encoding.
