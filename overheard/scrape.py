@@ -31,11 +31,45 @@ long_comment_regexp = "^\s*(%.*)$"
 # percent, that doesn't also match long_comment_regexp"
 short_comment_regexp = '.*?(%.*)$'
 
+encodings = ['utf-8',
+             'latin-1', 
+             'GB2312',
+             'Windows-1251',
+             'Windows-1252',
+             'utf-16',
+             'utf-32',
+             'ucs-1',
+             'ucs-2',
+             'ucs-4']
+
+def readlines(fn):   
+    """Read all lines from fn
+
+    Loop over guesses at the text encoding.
+
+    Can/should be more intelligent about this + read first big of file
+    to see if encoding is specified.
+
+    """
+    lines = None
+    error = None
+    for enc in encodings:
+        try:
+            with open(fn, encoding=enc) as ff:
+                lines = ff.readlines()
+        except UnicodeDecodeError, exc:
+            error = exc
+            continue
+        # Making it here means there were no errors on read.  Accept
+        # the encoding and continue
+        return lines
+    # This means no encodings were successful, raise exception
+    if lines is None:
+        raise error
+
 def long_comments(aid):
     "Scrape full-line and multi-line comments out of latex file"
-
-    with open(fetch.latex_file_path(aid)) as ff:
-        lines = ff.readlines()
+    lines = readlines(fetch.latex_file_path(aid))
     return long_comments_from_lines(lines)
 
 def long_comments_from_lines(lines):
@@ -72,8 +106,7 @@ def long_comments_from_lines(lines):
 
 def short_comments(aid):
     "Scrape partial-line comments out of latex file"
-    with open(fetch.latex_file_path(aid)) as ff:
-        lines = ff.readlines()
+    lines = readlines(fetch.latex_file_path(aid))
     return short_comments_from_lines(lines)
 
 def short_comments_from_lines(lines):
@@ -103,8 +136,7 @@ def write_output(aids, long_fn, short_fn, pickle_fn=None):
         for aid in aids:
             if verbose: print "Scraping comments from ", aid
 
-            with open(fetch.latex_file_path(aid)) as ff:
-                lines = ff.readlines()
+            lines = readlines(fetch.latex_file_path(aid))
 
             l_comments = long_comments_from_lines(lines)
             s_comments = short_comments_from_lines(lines)
