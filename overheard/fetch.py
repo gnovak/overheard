@@ -98,6 +98,8 @@
 # python code.  I find this acceptable.
 # 
 
+from __future__ import with_statement
+
 import sys, os, subprocess, tempfile, shutil, re, time
 
 import path, util, arxiv_id
@@ -239,7 +241,11 @@ def file_type_string(fn):
 
     pipe = subprocess.Popen(["file", fn], stdout=subprocess.PIPE)
     stdout, stderr = pipe.communicate()
-    return stdout
+    # Hmm... I finally have to learn something about string encodings.
+    # Output of pipe is ascii text, type() bytes, need to make it into
+    # a string to do regexps on it... what to assume?  utf-8 seems
+    # ok...
+    return stdout.decode('utf-8')
 
 def is_tar(fn):
     "Is this a tar file?"

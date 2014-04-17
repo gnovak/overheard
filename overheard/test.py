@@ -16,8 +16,17 @@
 # Run specific test interactively from REPL
 #   test.ArchivTest('test_old_arxiv_id').debug()
 #
+from __future__ import with_statement
 
 import unittest, re, tempfile, os
+
+if not hasattr(unittest, 'skipIf'):
+    try: 
+        import unittest2 as unittest        
+    except ImportError:
+        raise NotImplementedError, \
+            """Tests require either the Python 2.7 or later version of the unittest module or
+            the unittest2 module."""
 
 import arxiv_id, scrape, util, update, fetch, overheard
 
@@ -38,7 +47,11 @@ class OverheardTest(unittest.TestCase):
     def setUp(self):
         self.fetch_verbose_setting = fetch.verbose
         self.scrape_verbose_setting = scrape.verbose
-        fetch.verbose = False
+        # This is the _only_ test where I download some
+        # non-pre-screened papers, ie, they could be big.  It's useful
+        # to show the download so I don't get worried that the test
+        # has hung.
+        fetch.verbose = True
         scrape.verbose = False
 
     def tearDown(self):

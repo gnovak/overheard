@@ -8,6 +8,8 @@
 # wget, tar, file, cat, gzip
 #
 
+from __future__ import with_statement
+
 import sys, os, datetime, argparse
 
 import path, update, fetch, scrape

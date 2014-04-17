@@ -11,6 +11,8 @@
 # shows up in the python strings as "\\%" and a regexp for just '%'
 # doesn't match them, which simplifies my life...
 
+from __future__ import with_statement
+
 import os, re
 
 import fetch, util
@@ -29,11 +31,45 @@ long_comment_regexp = "^\s*(%.*)$"
 # percent, that doesn't also match long_comment_regexp"
 short_comment_regexp = '.*?(%.*)$'
 
+encodings = ['utf-8',
+             'latin-1',
+             'GB2312',
+             'Windows-1251',
+             'Windows-1252',
+             'utf-16',
+             'utf-32',
+             'ucs-1',
+             'ucs-2',
+             'ucs-4']
+
+def readlines(fn):
+    """Read all lines from fn
+
+    Loop over guesses at the text encoding.
+
+    Can/should be more intelligent about this + read first big of file
+    to see if encoding is specified.
+
+    """
+    lines = None
+    error = None
+    for enc in encodings:
+        try:
+            with open(fn, encoding=enc) as ff:
+                lines = ff.readlines()
+        except UnicodeDecodeError, exc:
+            error = exc
+            continue
+        # Making it here means there were no errors on read.  Accept
+        # the encoding and continue
+        return lines
+    # This means no encodings were successful, raise exception
+    if lines is None:
+        raise error
+
 def long_comments(aid):
     "Scrape full-line and multi-line comments out of latex file"
-
-    with open(fetch.latex_file_path(aid)) as ff:
-        lines = ff.readlines()
+    lines = readlines(fetch.latex_file_path(aid))
     return long_comments_from_lines(lines)
 
 def long_comments_from_lines(lines):
@@ -70,8 +106,8 @@ def long_comments_from_lines(lines):
 
 def short_comments(aid):
     "Scrape partial-line comments out of latex file"
-    with open(fetch.latex_file_path(aid)) as ff:
-        lines = ff.readlines()
+    lines = readlines(fetch.latex_file_path(aid))
+    return short_comments_from_lines(lines)
 
 def short_comments_from_lines(lines):
     "Get short comments out of latex file"
@@ -95,27 +131,27 @@ def write_output(aids, long_fn, short_fn, pickle_fn=None):
         s_result = {}
         l_result = {}
 
-    with open(long_fn, 'w') as l_outf, open(short_fn, 'w') as s_outf:    
-        for aid in aids:
-            if verbose: print "Scraping comments from ", aid
+    with open(long_fn, 'w') as l_outf:
+        with open(short_fn, 'w') as s_outf:
+            for aid in aids:
+                if verbose: print "Scraping comments from ", aid
 
-            with open(fetch.latex_file_path(aid)) as ff:
-                lines = ff.readlines()
-            
-            l_comments = long_comments_from_lines(lines)
-            s_comments = short_comments_from_lines(lines)
+                lines = readlines(fetch.latex_file_path(aid))
 
-            for comment in l_comments:
-                l_outf.writelines(comment)
-                l_outf.write('\n')
+                l_comments = long_comments_from_lines(lines)
+                s_comments = short_comments_from_lines(lines)
 
-            for comment in s_comments:
-                s_outf.write(comment)
-                s_outf.write('\n')
+                for comment in l_comments:
+                    l_outf.writelines(comment)
+                    l_outf.write('\n')
 
-            if pickle_fn:
-                l_result[aid] = l_comments
-                s_result[aid] = s_comments
+                for comment in s_comments:
+                    s_outf.write(comment)
+                    s_outf.write('\n')
+
+                if pickle_fn:
+                    l_result[aid] = l_comments
+                    s_result[aid] = s_comments
 
     if pickle_fn:
         util.can((l_result,s_result), pickle_fn)
