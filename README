@@ -15,6 +15,14 @@ http://github.org/overheard
 Requirements
 ============
 
+Passes tests on 2.5, 2.6, 2.7, 
+Passes tests on 3.2, 3.3, 3.4
+
+Python 2.5, 2.6 picks up dependency on unittest2 (for tests)
+Python 2.5, 2.6, 3.1 picks up dependency on argparse
+
+On 3.1, doesn't find tests...
+
 Installation
 ============
 
