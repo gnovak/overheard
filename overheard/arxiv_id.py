@@ -8,11 +8,15 @@ import re
 
 # old-style identifier is archive name followed by seven digits,
 # yymmNNN.  archive name is lowercase letters with dashes
-old_regexp = '^([-a-z]+)/([0-9]{4})([0-9]{3})(v[0-9]+)?$'
+partial_old_regexp = '([-a-z]+)/([0-9]{4})([0-9]{3})(v[0-9]+)?'
 
 # new-style identifier is is 4 digits, dot, 4 digits:
 # yymm.NNNN
-new_regexp = '^()([0-9]{4}).([0-9]{4})(v[0-9]+)?$'
+partial_new_regexp = '()([0-9]{4}).([0-9]{4})(v[0-9]+)?'
+
+# The full string must be only the arxiv id with no extra crap for these:
+old_regexp = '^' + partial_old_regexp + '$'
+new_regexp = '^' + partial_new_regexp + '$'
 
 # Match fields for both are are archive name, yymm, number, version
 # 
@@ -53,3 +57,9 @@ def version(aid):
     # specified b/c this makes downstream code simpler.
     return match.group(4) or ''
  
+def extract_aid(ss):
+    """Extract the first valid arxiv id from string ss"""
+    match = (re.search(partial_new_regexp, ss) or 
+             re.search(partial_old_regexp, ss) or 
+             None)
+    return match.group(0) if match else None
