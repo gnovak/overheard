@@ -13,7 +13,7 @@
 
 from __future__ import with_statement
 
-import os, re
+import os, re, io
 
 import fetch, util
 
@@ -55,7 +55,7 @@ def readlines(fn):
     error = None
     for enc in encodings:
         try:
-            with open(fn, encoding=enc) as ff:
+            with io.open(fn, encoding=enc) as ff:
                 lines = ff.readlines()
         except UnicodeDecodeError, exc:
             error = exc
@@ -134,24 +134,31 @@ def write_output(aids, long_fn, short_fn, pickle_fn=None):
     with open(long_fn, 'w') as l_outf:
         with open(short_fn, 'w') as s_outf:
             for aid in aids:
-                if verbose: print "Scraping comments from ", aid
+                try:
+                    if verbose: print "Scraping comments from ", aid
 
-                lines = readlines(fetch.latex_file_path(aid))
+                    lines = readlines(fetch.latex_file_path(aid))
 
-                l_comments = long_comments_from_lines(lines)
-                s_comments = short_comments_from_lines(lines)
+                    l_comments = long_comments_from_lines(lines)
+                    s_comments = short_comments_from_lines(lines)
 
-                for comment in l_comments:
-                    l_outf.writelines(comment)
-                    l_outf.write('\n')
+                    for comment in l_comments:
+                        l_outf.writelines(comment)
+                        l_outf.write('\n')
 
-                for comment in s_comments:
-                    s_outf.write(comment)
-                    s_outf.write('\n')
+                    for comment in s_comments:
+                        s_outf.write(comment)
+                        s_outf.write('\n')
 
-                if pickle_fn:
-                    l_result[aid] = l_comments
-                    s_result[aid] = s_comments
+                    if pickle_fn:
+                        l_result[aid] = l_comments
+                        s_result[aid] = s_comments
+                except TypeError:
+                    print "Kill (type)", aid
+                    continue
+                except UnicodeEncodeError:
+                    print "Kill (unicode)", aid
+                    continue
 
     if pickle_fn:
         util.can((l_result,s_result), pickle_fn)
