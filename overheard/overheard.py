@@ -14,6 +14,18 @@ import sys, os, datetime, argparse
 
 import path, update, fetch, scrape
 
+def process_papers(aids, fn_base, delay=5, prefix='.'):
+    "Download today's papers and extract comments"
+    # nmax is for testing to specify that a small number of papers
+    # should be fetched.
+
+    long_fn = os.path.join(prefix, fn_base + '-long.tex')
+    short_fn = os.path.join(prefix, fn_base + '-short.tex')
+
+    fetch.all_source(aids, delay=delay)
+    fetch.all_latex(aids)    
+    scrape.write_output(aids, long_fn, short_fn)
+
 def process_todays_papers(delay=60, prefix='.', nmax=None):
     "Download today's papers and extract comments"
     # nmax is for testing to specify that a small number of papers
